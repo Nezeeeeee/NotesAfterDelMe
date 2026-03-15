@@ -13,6 +13,18 @@ namespace NotesApp.Infrastructure.Data
 
         public DatabaseContext()
         {
+            //Если хочешь чтобы бд была в папке с прогой то:
+            // База данных будет в папке с программой
+            //var appDataPath = Path.Combine(
+            //    AppDomain.CurrentDomain.BaseDirectory,
+            //    "Data");
+
+            //if (!Directory.Exists(appDataPath))
+            //    Directory.CreateDirectory(appDataPath);
+
+            //_databasePath = Path.Combine(appDataPath, "notes.db");
+            //_connection = new SqliteConnection($"Data Source={_databasePath}");
+
             var appDataPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "NotesApp");
