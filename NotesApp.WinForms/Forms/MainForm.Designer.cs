@@ -31,143 +31,200 @@ namespace NotesApp.WinForms.Forms
 
         private void InitializeComponent()
         {
-            this.SuspendLayout();
-
-            System.Windows.Forms.Panel searchPanel = new System.Windows.Forms.Panel();
-            System.Windows.Forms.Label lblSearch = new System.Windows.Forms.Label();
-            System.Windows.Forms.Label lblTags = new System.Windows.Forms.Label();
-            System.Windows.Forms.Panel actionPanel = new System.Windows.Forms.Panel();
-
-            // MainForm
-            this.Text = "Notes Manager";
-            this.Size = new System.Drawing.Size(1000, 600);
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
+            searchPanel = new Panel();
+            lblSearch = new Label();
+            txtSearch = new TextBox();
+            lblTags = new Label();
+            txtTagFilter = new TextBox();
+            btnSearch = new Button();
+            actionPanel = new Panel();
+            btnAdd = new Button();
+            btnEdit = new Button();
+            btnDelete = new Button();
+            pnlTags = new Panel();
+            lblTagsTitle = new Label();
+            btnClearTags = new Button();
+            flpTagFilters = new FlowLayoutPanel();
+            lstNotes = new ListBox();
+            searchPanel.SuspendLayout();
+            actionPanel.SuspendLayout();
+            pnlTags.SuspendLayout();
+            SuspendLayout();
+            // 
             // searchPanel
-            searchPanel.Dock = System.Windows.Forms.DockStyle.Top;
-            searchPanel.Height = 100;
-            searchPanel.Padding = new System.Windows.Forms.Padding(10);
-
-            // lblSearch
-            lblSearch.Text = "Search:";
-            lblSearch.Location = new System.Drawing.Point(10, 15);
-            lblSearch.Size = new System.Drawing.Size(50, 25);
-
-            // txtSearch
-            this.txtSearch = new System.Windows.Forms.TextBox();
-            this.txtSearch.Location = new System.Drawing.Point(70, 12);
-            this.txtSearch.Size = new System.Drawing.Size(300, 25);
-
-            // lblTags
-            lblTags.Text = "Tags:";
-            lblTags.Location = new System.Drawing.Point(380, 15);
-            lblTags.Size = new System.Drawing.Size(40, 25);
-
-            // txtTagFilter
-            this.txtTagFilter = new System.Windows.Forms.TextBox();
-            this.txtTagFilter.Location = new System.Drawing.Point(430, 12);
-            this.txtTagFilter.Size = new System.Drawing.Size(200, 25);
-            this.txtTagFilter.PlaceholderText = "tag1, tag2, tag3";
-
-            // btnSearch
-            this.btnSearch = new System.Windows.Forms.Button();
-            this.btnSearch.Text = "Search";
-            this.btnSearch.Location = new System.Drawing.Point(640, 10);
-            this.btnSearch.Size = new System.Drawing.Size(100, 30);
-            this.btnSearch.Click += new System.EventHandler(this.BtnSearch_Click);
-
-            // actionPanel
-            actionPanel.Location = new System.Drawing.Point(10, 50);
-            actionPanel.Size = new System.Drawing.Size(980, 40);
-
-            // btnAdd
-            this.btnAdd = new System.Windows.Forms.Button();
-            this.btnAdd.Text = "Add Note";
-            this.btnAdd.Location = new System.Drawing.Point(0, 0);
-            this.btnAdd.Size = new System.Drawing.Size(100, 30);
-            this.btnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
-
-            // btnEdit
-            this.btnEdit = new System.Windows.Forms.Button();
-            this.btnEdit.Text = "Edit";
-            this.btnEdit.Location = new System.Drawing.Point(110, 0);
-            this.btnEdit.Size = new System.Drawing.Size(100, 30);
-            this.btnEdit.Click += new System.EventHandler(this.BtnEdit_Click);
-
-            // btnDelete
-            this.btnDelete = new System.Windows.Forms.Button();
-            this.btnDelete.Text = "Delete";
-            this.btnDelete.Location = new System.Drawing.Point(220, 0);
-            this.btnDelete.Size = new System.Drawing.Size(100, 30);
-            this.btnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
-
-            // Добавляем кнопки в actionPanel
-            actionPanel.Controls.Add(this.btnAdd);
-            actionPanel.Controls.Add(this.btnEdit);
-            actionPanel.Controls.Add(this.btnDelete);
-
-            // Добавляем контролы в searchPanel
+            // 
             searchPanel.Controls.Add(lblSearch);
-            searchPanel.Controls.Add(this.txtSearch);
+            searchPanel.Controls.Add(txtSearch);
             searchPanel.Controls.Add(lblTags);
-            searchPanel.Controls.Add(this.txtTagFilter);
-            searchPanel.Controls.Add(this.btnSearch);
+            searchPanel.Controls.Add(txtTagFilter);
+            searchPanel.Controls.Add(btnSearch);
             searchPanel.Controls.Add(actionPanel);
-
-            // ============ УВЕЛИЧЕННАЯ ПАНЕЛЬ С ТЕГАМИ ============
-            this.pnlTags = new System.Windows.Forms.Panel();
-            this.pnlTags.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTags.Height = 120; // Увеличено с 50 до 120
-            this.pnlTags.Padding = new System.Windows.Forms.Padding(10);
-            this.pnlTags.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-            this.pnlTags.BackColor = System.Drawing.Color.WhiteSmoke;
-
-            // Заголовок для тегов
-            System.Windows.Forms.Label lblTagsTitle = new System.Windows.Forms.Label();
+            searchPanel.Dock = DockStyle.Top;
+            searchPanel.Location = new Point(0, 0);
+            searchPanel.Name = "searchPanel";
+            searchPanel.Padding = new Padding(10);
+            searchPanel.Size = new Size(984, 100);
+            searchPanel.TabIndex = 2;
+            // 
+            // lblSearch
+            // 
+            lblSearch.Location = new Point(10, 15);
+            lblSearch.Name = "lblSearch";
+            lblSearch.Size = new Size(50, 25);
+            lblSearch.TabIndex = 0;
+            lblSearch.Text = "Search:";
+            // 
+            // txtSearch
+            // 
+            txtSearch.Location = new Point(70, 12);
+            txtSearch.Name = "txtSearch";
+            txtSearch.Size = new Size(300, 23);
+            txtSearch.TabIndex = 1;
+            // 
+            // lblTags
+            // 
+            lblTags.Location = new Point(380, 15);
+            lblTags.Name = "lblTags";
+            lblTags.Size = new Size(40, 25);
+            lblTags.TabIndex = 2;
+            lblTags.Text = "Tags:";
+            // 
+            // txtTagFilter
+            // 
+            txtTagFilter.Location = new Point(430, 12);
+            txtTagFilter.Name = "txtTagFilter";
+            txtTagFilter.PlaceholderText = "tag1, tag2, tag3";
+            txtTagFilter.Size = new Size(200, 23);
+            txtTagFilter.TabIndex = 3;
+            // 
+            // btnSearch
+            // 
+            btnSearch.Location = new Point(640, 10);
+            btnSearch.Name = "btnSearch";
+            btnSearch.Size = new Size(100, 30);
+            btnSearch.TabIndex = 4;
+            btnSearch.Text = "Search";
+            btnSearch.Click += BtnSearch_Click;
+            // 
+            // actionPanel
+            // 
+            actionPanel.Controls.Add(btnAdd);
+            actionPanel.Controls.Add(btnEdit);
+            actionPanel.Controls.Add(btnDelete);
+            actionPanel.Location = new Point(10, 50);
+            actionPanel.Name = "actionPanel";
+            actionPanel.Size = new Size(980, 40);
+            actionPanel.TabIndex = 5;
+            // 
+            // btnAdd
+            // 
+            btnAdd.Location = new Point(0, 0);
+            btnAdd.Name = "btnAdd";
+            btnAdd.Size = new Size(100, 30);
+            btnAdd.TabIndex = 0;
+            btnAdd.Text = "Add Note";
+            btnAdd.Click += BtnAdd_Click;
+            // 
+            // btnEdit
+            // 
+            btnEdit.Location = new Point(110, 0);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(100, 30);
+            btnEdit.TabIndex = 1;
+            btnEdit.Text = "Edit";
+            btnEdit.Click += BtnEdit_Click;
+            // 
+            // btnDelete
+            // 
+            btnDelete.Location = new Point(220, 0);
+            btnDelete.Name = "btnDelete";
+            btnDelete.Size = new Size(100, 30);
+            btnDelete.TabIndex = 2;
+            btnDelete.Text = "Delete";
+            btnDelete.Click += BtnDelete_Click;
+            // 
+            // pnlTags
+            // 
+            pnlTags.BackColor = Color.WhiteSmoke;
+            pnlTags.BorderStyle = BorderStyle.FixedSingle;
+            pnlTags.Controls.Add(lblTagsTitle);
+            pnlTags.Controls.Add(btnClearTags);
+            pnlTags.Controls.Add(flpTagFilters);
+            pnlTags.Dock = DockStyle.Top;
+            pnlTags.Location = new Point(0, 100);
+            pnlTags.Name = "pnlTags";
+            pnlTags.Padding = new Padding(10);
+            pnlTags.Size = new Size(984, 120);
+            pnlTags.TabIndex = 1;
+            // 
+            // lblTagsTitle
+            // 
+            lblTagsTitle.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold);
+            lblTagsTitle.Location = new Point(10, 5);
+            lblTagsTitle.Name = "lblTagsTitle";
+            lblTagsTitle.Size = new Size(400, 20);
+            lblTagsTitle.TabIndex = 0;
             lblTagsTitle.Text = "Фильтр по тегам (выберите один или несколько):";
-            lblTagsTitle.Location = new System.Drawing.Point(10, 5);
-            lblTagsTitle.Size = new System.Drawing.Size(400, 20);
-            lblTagsTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9, System.Drawing.FontStyle.Bold);
-            this.pnlTags.Controls.Add(lblTagsTitle);
-
-            // Кнопка для сброса фильтра
-            System.Windows.Forms.Button btnClearTags = new System.Windows.Forms.Button();
+            // 
+            // btnClearTags
+            // 
+            btnClearTags.Location = new Point(830, 3);
+            btnClearTags.Name = "btnClearTags";
+            btnClearTags.Size = new Size(120, 25);
+            btnClearTags.TabIndex = 1;
             btnClearTags.Text = "Сбросить фильтр";
-            btnClearTags.Location = new System.Drawing.Point(830, 3);
-            btnClearTags.Size = new System.Drawing.Size(120, 25);
-            btnClearTags.Click += new System.EventHandler(this.BtnClearTags_Click);
-            this.pnlTags.Controls.Add(btnClearTags);
-
-            // Панель с тегами
-            this.flpTagFilters = new System.Windows.Forms.FlowLayoutPanel();
-            this.flpTagFilters.Location = new System.Drawing.Point(10, 30);
-            this.flpTagFilters.Size = new System.Drawing.Size(960, 80); // Фиксированный размер
-            this.flpTagFilters.AutoScroll = true;
-            this.flpTagFilters.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.flpTagFilters.BackColor = System.Drawing.Color.White;
-            this.flpTagFilters.Padding = new System.Windows.Forms.Padding(5);
-            this.pnlTags.Controls.Add(this.flpTagFilters);
-            // ====================================================
-
+            btnClearTags.Click += BtnClearTags_Click;
+            // 
+            // flpTagFilters
+            // 
+            flpTagFilters.AutoScroll = true;
+            flpTagFilters.BackColor = Color.White;
+            flpTagFilters.Location = new Point(10, 30);
+            flpTagFilters.Name = "flpTagFilters";
+            flpTagFilters.Padding = new Padding(5);
+            flpTagFilters.Size = new Size(960, 80);
+            flpTagFilters.TabIndex = 2;
+            // 
             // lstNotes
-            this.lstNotes = new System.Windows.Forms.ListBox();
-            this.lstNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstNotes.DisplayMember = "Title";
-            this.lstNotes.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.lstNotes.IntegralHeight = false;
-            this.lstNotes.ItemHeight = 60;
-            this.lstNotes.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.LstNotes_DrawItem);
-            this.lstNotes.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.LstNotes_MeasureItem);
-            this.lstNotes.SelectedIndexChanged += new System.EventHandler(this.LstNotes_SelectedIndexChanged);
-
-            // Добавляем контролы на форму
-            this.Controls.Add(this.lstNotes);
-            this.Controls.Add(this.pnlTags);
-            this.Controls.Add(searchPanel);
-
-            this.ResumeLayout(false);
+            // 
+            lstNotes.DisplayMember = "Title";
+            lstNotes.Dock = DockStyle.Fill;
+            lstNotes.DrawMode = DrawMode.OwnerDrawVariable;
+            lstNotes.IntegralHeight = false;
+            lstNotes.ItemHeight = 60;
+            lstNotes.Location = new Point(0, 220);
+            lstNotes.Name = "lstNotes";
+            lstNotes.Size = new Size(984, 341);
+            lstNotes.TabIndex = 0;
+            lstNotes.DrawItem += LstNotes_DrawItem;
+            lstNotes.MeasureItem += LstNotes_MeasureItem;
+            lstNotes.SelectedIndexChanged += LstNotes_SelectedIndexChanged;
+            // 
+            // MainForm
+            // 
+            ClientSize = new Size(984, 561);
+            Controls.Add(lstNotes);
+            Controls.Add(pnlTags);
+            Controls.Add(searchPanel);
+            Icon = (Icon)resources.GetObject("$this.Icon");
+            Name = "MainForm";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Notes Manager";
+            searchPanel.ResumeLayout(false);
+            searchPanel.PerformLayout();
+            actionPanel.ResumeLayout(false);
+            pnlTags.ResumeLayout(false);
+            ResumeLayout(false);
         }
 
         #endregion
+
+        private Panel searchPanel;
+        private Label lblSearch;
+        private Label lblTags;
+        private Panel actionPanel;
+        private Label lblTagsTitle;
+        private Button btnClearTags;
     }
 }
