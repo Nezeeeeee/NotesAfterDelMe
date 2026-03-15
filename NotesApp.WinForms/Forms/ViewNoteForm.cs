@@ -41,6 +41,7 @@ namespace NotesApp.WinForms.Forms
             };
             flpTags.Controls.Add(lblTagsHeader);
 
+
             // Отображаем теги в виде красивых кнопок/меток
             if (_note.Tags != null && _note.Tags.Any())
             {
