@@ -203,7 +203,7 @@ namespace NotesApp.WinForms.Forms
 
             // Дата создания/обновления
             var dateStr = note.UpdatedAt.ToString("dd.MM.yyyy HH:mm");
-            e.Graphics.DrawString(dateStr, e.Font, Brushes.Gray,
+            e.Graphics.DrawString(dateStr, e.Font, Brushes.Brown,
                 new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 25, e.Bounds.Width - 10, 15));
 
             // Контент (содержимое заметки)
