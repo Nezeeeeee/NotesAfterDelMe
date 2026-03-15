@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="NotesApp.Application/NotesApp.Application.csproj" />
+  <Project Path="NotesApp.Domain/NotesApp.Domain.csproj" />
+  <Project Path="NotesApp.Infrastructure/NotesApp.Infrastructure.csproj" />
+  <Project Path="NotesApp.WinForms/NotesApp.WinForms.csproj" Id="dce2cb30-8c40-4cb5-bccf-fe096a240b65" />
+</Solution>
