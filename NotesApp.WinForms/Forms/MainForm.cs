@@ -19,6 +19,10 @@ namespace NotesApp.WinForms.Forms
         {
             _noteService = noteService;
             InitializeComponent();
+
+            // Подписываемся на двойной клик
+            this.lstNotes.DoubleClick += LstNotes_DoubleClick;
+
             LoadNotesAsync();
         }
 
@@ -39,6 +43,18 @@ namespace NotesApp.WinForms.Forms
 
             flpTagFilters.Controls.Clear();
 
+            // Добавляем заголовок "Все теги:"
+            var lblAllTags = new Label
+            {
+                Text = "Все теги:",
+                Font = new Font("Microsoft Sans Serif", 8, FontStyle.Bold),
+                AutoSize = true,
+                Padding = new Padding(5),
+                ForeColor = Color.Gray
+            };
+            flpTagFilters.Controls.Add(lblAllTags);
+
+            // Добавляем сами теги
             foreach (var tag in allTags)
             {
                 var chkBox = new CheckBox
@@ -46,10 +62,76 @@ namespace NotesApp.WinForms.Forms
                     Text = tag,
                     Tag = tag,
                     AutoSize = true,
-                    Padding = new Padding(5)
+                    Padding = new Padding(5),
+                    Margin = new Padding(3),
+                    BackColor = Color.LightGoldenrodYellow,
+                    FlatStyle = FlatStyle.Flat
                 };
+
+                // Добавляем контекстное меню для удаления тега
+                var contextMenu = new ContextMenuStrip();
+                var deleteMenuItem = new ToolStripMenuItem("Удалить тег");
+                deleteMenuItem.Click += (s, e) => DeleteTag(tag);
+                contextMenu.Items.Add(deleteMenuItem);
+                chkBox.ContextMenuStrip = contextMenu;
+
                 chkBox.CheckedChanged += ChkBox_CheckedChanged;
                 flpTagFilters.Controls.Add(chkBox);
+            }
+
+            // Если тегов нет
+            if (!allTags.Any())
+            {
+                var lblNoTags = new Label
+                {
+                    Text = "Нет тегов",
+                    AutoSize = true,
+                    Padding = new Padding(5),
+                    ForeColor = Color.Gray
+                };
+                flpTagFilters.Controls.Add(lblNoTags);
+            }
+        }
+
+        private async void DeleteTag(string tagName)
+        {
+            var result = MessageBox.Show(
+                $"Удалить тег '{tagName}' из всех заметок?",
+                "Подтверждение удаления",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                try
+                {
+                    // Находим все заметки с этим тегом
+                    var notesWithTag = _currentNotes.Where(n => n.Tags.Contains(tagName)).ToList();
+
+                    foreach (var note in notesWithTag)
+                    {
+                        // Удаляем тег из заметки
+                        var updateDto = new UpdateNoteDto
+                        {
+                            Id = note.Id,
+                            Title = note.Title,
+                            Content = note.Content,
+                            Tags = note.Tags.Where(t => t != tagName).ToList()
+                        };
+                        await _noteService.UpdateNoteAsync(updateDto);
+                    }
+
+                    MessageBox.Show($"Тег '{tagName}' успешно удален из {notesWithTag.Count} заметок",
+                        "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Обновляем список заметок
+                    LoadNotesAsync();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Ошибка при удалении тега: {ex.Message}",
+                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
         }
 
@@ -100,23 +182,54 @@ namespace NotesApp.WinForms.Forms
             var listBox = sender as ListBox;
             var note = listBox.Items[e.Index] as NoteDto;
 
-            e.DrawBackground();
+            // Проверяем, выбран ли элемент (наведен или выделен)
+            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
+            {
+                // Заливаем фон выбранного элемента нужным цветом
+                e.Graphics.FillRectangle(new SolidBrush(Color.LightGoldenrodYellow), e.Bounds);
+            }
+            else
+            {
+                // Стандартный фон для невыбранных элементов
+                e.DrawBackground();
+            }
 
+            // Заголовок (жирным шрифтом)
             using (var titleFont = new Font(e.Font, FontStyle.Bold))
             {
                 e.Graphics.DrawString(note.Title, titleFont, Brushes.Black,
                     new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 5, e.Bounds.Width - 10, 20));
             }
 
+            // Дата создания/обновления
             var dateStr = note.UpdatedAt.ToString("dd.MM.yyyy HH:mm");
-            e.Graphics.DrawString(dateStr, e.Font, Brushes.Yellow,
+            e.Graphics.DrawString(dateStr, e.Font, Brushes.Gray,
                 new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 25, e.Bounds.Width - 10, 15));
 
+            // Контент (содержимое заметки)
+            string content = note.Content ?? "";
+            if (content.Length > 50)
+                content = content.Substring(0, 50) + "...";
+
+            e.Graphics.DrawString(content, e.Font, Brushes.Black,
+                new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 40, e.Bounds.Width - 10, 20));
+
+            // Теги
             if (note.Tags.Any())
             {
-                var tagsStr = "Tags: " + string.Join(", ", note.Tags);
-                e.Graphics.DrawString(tagsStr, e.Font, Brushes.YellowGreen,
-                    new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 40, e.Bounds.Width - 10, 15));
+                string tagsStr;
+                if (note.Tags.Count > 5)
+                {
+                    var firstFive = string.Join(", ", note.Tags.Take(5));
+                    tagsStr = $"Tags: {firstFive} ... и еще {note.Tags.Count - 5}";
+                }
+                else
+                {
+                    tagsStr = "Tags: " + string.Join(", ", note.Tags);
+                }
+
+                e.Graphics.DrawString(tagsStr, e.Font, Brushes.DarkBlue,
+                    new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 62, e.Bounds.Width - 10, 15));
             }
 
             e.DrawFocusRectangle();
@@ -124,13 +237,25 @@ namespace NotesApp.WinForms.Forms
 
         private void LstNotes_MeasureItem(object sender, MeasureItemEventArgs e)
         {
-            e.ItemHeight = 60;
+            e.ItemHeight = 80;
         }
 
         private void LstNotes_SelectedIndexChanged(object sender, EventArgs e)
         {
             btnEdit.Enabled = lstNotes.SelectedItem != null;
             btnDelete.Enabled = lstNotes.SelectedItem != null;
+        }
+
+        // НОВЫЙ МЕТОД: обработка двойного клика для просмотра полной заметки
+        private void LstNotes_DoubleClick(object sender, EventArgs e)
+        {
+            if (lstNotes.SelectedItem is NoteDto selectedNote)
+            {
+                using (var viewForm = new ViewNoteForm(selectedNote))
+                {
+                    viewForm.ShowDialog();
+                }
+            }
         }
 
         private async void BtnSearch_Click(object sender, EventArgs e)
@@ -187,6 +312,28 @@ namespace NotesApp.WinForms.Forms
                     LoadNotesAsync();
                 }
             }
+        }
+
+        private void BtnClearTags_Click(object sender, EventArgs e)
+        {
+            // Сбрасываем все выбранные теги
+            _selectedTags.Clear();
+
+            // Снимаем отметки со всех CheckBox
+            foreach (Control control in flpTagFilters.Controls)
+            {
+                if (control is CheckBox chkBox)
+                {
+                    chkBox.Checked = false;
+                }
+            }
+
+            // Очищаем поле поиска
+            txtSearch.Text = "";
+            txtTagFilter.Text = "";
+
+            // Загружаем все заметки
+            LoadNotesAsync();
         }
     }
 }

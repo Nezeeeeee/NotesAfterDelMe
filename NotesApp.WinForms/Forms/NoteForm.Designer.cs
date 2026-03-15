@@ -4,10 +4,10 @@
     {
         private System.ComponentModel.IContainer components = null;
 
-        // Объявляем все поля класса
+        // Объявляем все поля класса (ТОЛЬКО ЗДЕСЬ!)
         private System.Windows.Forms.TextBox txtTitle;
         private System.Windows.Forms.TextBox txtContent;
-        private System.Windows.Forms.TextBox txtTags;
+        private System.Windows.Forms.FlowLayoutPanel flpTagsContainer;
         private System.Windows.Forms.Button btnSave;
         private System.Windows.Forms.Button btnCancel;
 
@@ -31,7 +31,7 @@
             System.Windows.Forms.Label lblTags = new System.Windows.Forms.Label();
 
             // NoteForm
-            this.Size = new System.Drawing.Size(600, 500);
+            this.Size = new System.Drawing.Size(700, 600);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
@@ -44,7 +44,7 @@
             // txtTitle
             this.txtTitle = new System.Windows.Forms.TextBox();
             this.txtTitle.Location = new System.Drawing.Point(70, 10);
-            this.txtTitle.Size = new System.Drawing.Size(500, 25);
+            this.txtTitle.Size = new System.Drawing.Size(600, 25);
 
             // lblContent
             lblContent.Text = "Content:";
@@ -54,24 +54,27 @@
             // txtContent
             this.txtContent = new System.Windows.Forms.TextBox();
             this.txtContent.Location = new System.Drawing.Point(70, 45);
-            this.txtContent.Size = new System.Drawing.Size(500, 300);
+            this.txtContent.Size = new System.Drawing.Size(600, 350);
             this.txtContent.Multiline = true;
             this.txtContent.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
 
             // lblTags
             lblTags.Text = "Tags:";
-            lblTags.Location = new System.Drawing.Point(10, 355);
+            lblTags.Location = new System.Drawing.Point(10, 410);
             lblTags.Size = new System.Drawing.Size(50, 25);
 
-            // txtTags
-            this.txtTags = new System.Windows.Forms.TextBox();
-            this.txtTags.Location = new System.Drawing.Point(70, 355);
-            this.txtTags.Size = new System.Drawing.Size(500, 25);
+            // flpTagsContainer - контейнер для тегов
+            this.flpTagsContainer = new System.Windows.Forms.FlowLayoutPanel();
+            this.flpTagsContainer.Location = new System.Drawing.Point(70, 410);
+            this.flpTagsContainer.Size = new System.Drawing.Size(600, 120);
+            this.flpTagsContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.flpTagsContainer.AutoScroll = true;
+            this.flpTagsContainer.Padding = new System.Windows.Forms.Padding(5);
 
             // btnSave
             this.btnSave = new System.Windows.Forms.Button();
             this.btnSave.Text = "Save";
-            this.btnSave.Location = new System.Drawing.Point(400, 400);
+            this.btnSave.Location = new System.Drawing.Point(500, 540);
             this.btnSave.Size = new System.Drawing.Size(80, 30);
             this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
@@ -79,7 +82,7 @@
             // btnCancel
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnCancel.Text = "Cancel";
-            this.btnCancel.Location = new System.Drawing.Point(490, 400);
+            this.btnCancel.Location = new System.Drawing.Point(590, 540);
             this.btnCancel.Size = new System.Drawing.Size(80, 30);
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 
@@ -89,7 +92,7 @@
             this.Controls.Add(lblContent);
             this.Controls.Add(this.txtContent);
             this.Controls.Add(lblTags);
-            this.Controls.Add(this.txtTags);
+            this.Controls.Add(this.flpTagsContainer);
             this.Controls.Add(this.btnSave);
             this.Controls.Add(this.btnCancel);
 

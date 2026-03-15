@@ -1,4 +1,7 @@
-﻿namespace NotesApp.WinForms.Forms
+﻿using System.Drawing;
+using System.Windows.Forms;
+
+namespace NotesApp.WinForms.Forms
 {
     partial class MainForm
     {
@@ -64,6 +67,7 @@
             this.txtTagFilter = new System.Windows.Forms.TextBox();
             this.txtTagFilter.Location = new System.Drawing.Point(430, 12);
             this.txtTagFilter.Size = new System.Drawing.Size(200, 25);
+            this.txtTagFilter.PlaceholderText = "tag1, tag2, tag3";
 
             // btnSearch
             this.btnSearch = new System.Windows.Forms.Button();
@@ -110,18 +114,40 @@
             searchPanel.Controls.Add(this.btnSearch);
             searchPanel.Controls.Add(actionPanel);
 
-            // pnlTags
+            // ============ УВЕЛИЧЕННАЯ ПАНЕЛЬ С ТЕГАМИ ============
             this.pnlTags = new System.Windows.Forms.Panel();
             this.pnlTags.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTags.Height = 50;
+            this.pnlTags.Height = 120; // Увеличено с 50 до 120
             this.pnlTags.Padding = new System.Windows.Forms.Padding(10);
             this.pnlTags.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.pnlTags.BackColor = System.Drawing.Color.WhiteSmoke;
 
-            // flpTagFilters
+            // Заголовок для тегов
+            System.Windows.Forms.Label lblTagsTitle = new System.Windows.Forms.Label();
+            lblTagsTitle.Text = "Фильтр по тегам (выберите один или несколько):";
+            lblTagsTitle.Location = new System.Drawing.Point(10, 5);
+            lblTagsTitle.Size = new System.Drawing.Size(400, 20);
+            lblTagsTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 9, System.Drawing.FontStyle.Bold);
+            this.pnlTags.Controls.Add(lblTagsTitle);
+
+            // Кнопка для сброса фильтра
+            System.Windows.Forms.Button btnClearTags = new System.Windows.Forms.Button();
+            btnClearTags.Text = "Сбросить фильтр";
+            btnClearTags.Location = new System.Drawing.Point(830, 3);
+            btnClearTags.Size = new System.Drawing.Size(120, 25);
+            btnClearTags.Click += new System.EventHandler(this.BtnClearTags_Click);
+            this.pnlTags.Controls.Add(btnClearTags);
+
+            // Панель с тегами
             this.flpTagFilters = new System.Windows.Forms.FlowLayoutPanel();
-            this.flpTagFilters.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpTagFilters.Location = new System.Drawing.Point(10, 30);
+            this.flpTagFilters.Size = new System.Drawing.Size(960, 80); // Фиксированный размер
             this.flpTagFilters.AutoScroll = true;
+            this.flpTagFilters.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.flpTagFilters.BackColor = System.Drawing.Color.White;
+            this.flpTagFilters.Padding = new System.Windows.Forms.Padding(5);
             this.pnlTags.Controls.Add(this.flpTagFilters);
+            // ====================================================
 
             // lstNotes
             this.lstNotes = new System.Windows.Forms.ListBox();
