@@ -23,7 +23,26 @@ namespace NotesApp.WinForms.Forms
             // Подписываемся на двойной клик
             this.lstNotes.DoubleClick += LstNotes_DoubleClick;
 
+            // Устанавливаем начальный язык в соответствии с выбранным в комбобоксе
+            SetInitialLanguage();
+
             LoadNotesAsync();
+        }
+
+        private void SetInitialLanguage()
+        {
+            // Устанавливаем язык в соответствии с выбранным в комбобоксе
+            if (cmbLanguage.SelectedIndex == 0) // Русский
+            {
+                LocalizationManager.CurrentLanguage = "ru";
+            }
+            else // English
+            {
+                LocalizationManager.CurrentLanguage = "en";
+            }
+
+            // Обновляем тексты на форме
+            UpdateUILanguage();
         }
 
         private async void LoadNotesAsync()
@@ -43,10 +62,10 @@ namespace NotesApp.WinForms.Forms
 
             flpTagFilters.Controls.Clear();
 
-            // Добавляем заголовок "Все теги:"
+            // Добавляем заголовок "Все теги:" с учетом языка
             var lblAllTags = new Label
             {
-                Text = "Все теги:",
+                Text = LocalizationManager.GetString("AllTags"),
                 Font = new Font("Microsoft Sans Serif", 8, FontStyle.Bold),
                 AutoSize = true,
                 Padding = new Padding(5),
@@ -70,7 +89,7 @@ namespace NotesApp.WinForms.Forms
 
                 // Добавляем контекстное меню для удаления тега
                 var contextMenu = new ContextMenuStrip();
-                var deleteMenuItem = new ToolStripMenuItem("Удалить тег");
+                var deleteMenuItem = new ToolStripMenuItem(LocalizationManager.GetString("Delete"));
                 deleteMenuItem.Click += (s, e) => DeleteTag(tag);
                 contextMenu.Items.Add(deleteMenuItem);
                 chkBox.ContextMenuStrip = contextMenu;
@@ -84,7 +103,7 @@ namespace NotesApp.WinForms.Forms
             {
                 var lblNoTags = new Label
                 {
-                    Text = "Нет тегов",
+                    Text = LocalizationManager.GetString("NoTags"),
                     AutoSize = true,
                     Padding = new Padding(5),
                     ForeColor = Color.Gray
@@ -96,8 +115,8 @@ namespace NotesApp.WinForms.Forms
         private async void DeleteTag(string tagName)
         {
             var result = MessageBox.Show(
-                $"Удалить тег '{tagName}' из всех заметок?",
-                "Подтверждение удаления",
+                LocalizationManager.GetString("DeleteTagConfirm", tagName),
+                LocalizationManager.GetString("ConfirmDelete"),
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Question);
 
@@ -105,12 +124,10 @@ namespace NotesApp.WinForms.Forms
             {
                 try
                 {
-                    // Находим все заметки с этим тегом
                     var notesWithTag = _currentNotes.Where(n => n.Tags.Contains(tagName)).ToList();
 
                     foreach (var note in notesWithTag)
                     {
-                        // Удаляем тег из заметки
                         var updateDto = new UpdateNoteDto
                         {
                             Id = note.Id,
@@ -121,16 +138,21 @@ namespace NotesApp.WinForms.Forms
                         await _noteService.UpdateNoteAsync(updateDto);
                     }
 
-                    MessageBox.Show($"Тег '{tagName}' успешно удален из {notesWithTag.Count} заметок",
-                        "Успешно", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show(
+                        LocalizationManager.GetString("DeleteTagSuccess", tagName, notesWithTag.Count),
+                        "Success",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
 
-                    // Обновляем список заметок
                     LoadNotesAsync();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Ошибка при удалении тега: {ex.Message}",
-                        "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(
+                        LocalizationManager.GetString("DeleteTagError", ex.Message),
+                        "Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
                 }
             }
         }
@@ -246,7 +268,6 @@ namespace NotesApp.WinForms.Forms
             btnDelete.Enabled = lstNotes.SelectedItem != null;
         }
 
-        // НОВЫЙ МЕТОД: обработка двойного клика для просмотра полной заметки
         private void LstNotes_DoubleClick(object sender, EventArgs e)
         {
             if (lstNotes.SelectedItem is NoteDto selectedNote)
@@ -301,8 +322,8 @@ namespace NotesApp.WinForms.Forms
             if (lstNotes.SelectedItem is NoteDto selectedNote)
             {
                 var result = MessageBox.Show(
-                    $"Delete note '{selectedNote.Title}'?",
-                    "Confirm Delete",
+                    LocalizationManager.GetString("DeleteNoteConfirm", selectedNote.Title),
+                    LocalizationManager.GetString("ConfirmDelete"),
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Question);
 
@@ -334,6 +355,38 @@ namespace NotesApp.WinForms.Forms
 
             // Загружаем все заметки
             LoadNotesAsync();
+        }
+
+        private void CmbLanguage_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbLanguage.SelectedIndex == 0) // Русский
+            {
+                LocalizationManager.CurrentLanguage = "ru";
+            }
+            else // English
+            {
+                LocalizationManager.CurrentLanguage = "en";
+            }
+
+            // Обновляем тексты на форме
+            UpdateUILanguage();
+        }
+
+        private void UpdateUILanguage()
+        {
+            // MainForm
+            this.Text = LocalizationManager.GetString("MainFormTitle");
+            lblSearch.Text = LocalizationManager.GetString("Search");
+            lblTags.Text = LocalizationManager.GetString("Tags");
+            btnSearch.Text = LocalizationManager.GetString("SearchButton");
+            btnAdd.Text = LocalizationManager.GetString("AddNote");
+            btnEdit.Text = LocalizationManager.GetString("Edit");
+            btnDelete.Text = LocalizationManager.GetString("Delete");
+            lblTagsTitle.Text = LocalizationManager.GetString("TagsFilterTitle");
+            btnClearTags.Text = LocalizationManager.GetString("ClearFilter");
+
+            // Обновляем заголовок "Все теги" в панели фильтров
+            LoadAllTagsAsync();
         }
     }
 }

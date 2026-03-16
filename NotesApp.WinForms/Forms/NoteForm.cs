@@ -20,18 +20,54 @@ namespace NotesApp.WinForms.Forms
             _note = note;
             InitializeComponent();
 
+            // Подписываемся на изменение языка
+            LocalizationManager.LanguageChanged += OnLanguageChanged;
+
             if (_note != null)
             {
                 _currentTags = new List<string>(_note.Tags);
                 LoadNote();
-                this.Text = "Edit Note";
+                this.Text = LocalizationManager.GetString("EditNote");
             }
             else
             {
-                this.Text = "New Note";
+                this.Text = LocalizationManager.GetString("NewNote");
             }
 
+            UpdateUILanguage();
             RefreshTagsDisplay();
+        }
+
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            UpdateUILanguage();
+            RefreshTagsDisplay();
+        }
+
+        private void UpdateUILanguage()
+        {
+            // Обновляем тексты контролов
+            foreach (Control control in this.Controls)
+            {
+                if (control is Label label)
+                {
+                    if (label.Text.Contains("Title") || label.Text.Contains("Заголовок"))
+                        label.Text = LocalizationManager.GetString("Title");
+                    else if (label.Text.Contains("Content") || label.Text.Contains("Содержание"))
+                        label.Text = LocalizationManager.GetString("Content");
+                    else if (label.Text.Contains("Tags") || label.Text.Contains("Теги"))
+                        label.Text = LocalizationManager.GetString("Tags_");
+                }
+            }
+
+            btnSave.Text = LocalizationManager.GetString("Save");
+            btnCancel.Text = LocalizationManager.GetString("Cancel");
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            LocalizationManager.LanguageChanged -= OnLanguageChanged;
+            base.OnFormClosed(e);
         }
 
         private void LoadNote()
@@ -95,7 +131,7 @@ namespace NotesApp.WinForms.Forms
             {
                 Location = new Point(0, 5),
                 Width = 160,
-                PlaceholderText = "новый тег",
+                PlaceholderText = LocalizationManager.GetString("NewTagPlaceholder"),
                 Font = new Font("Microsoft Sans Serif", 9)
             };
 
@@ -137,8 +173,11 @@ namespace NotesApp.WinForms.Forms
         {
             if (string.IsNullOrWhiteSpace(txtTitle.Text))
             {
-                MessageBox.Show("Title is required", "Validation Error",
-                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show(
+                    LocalizationManager.GetString("TitleRequired"),
+                    LocalizationManager.GetString("ValidationError"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Warning);
                 this.DialogResult = DialogResult.None;
                 return;
             }

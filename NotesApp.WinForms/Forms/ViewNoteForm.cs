@@ -14,25 +14,44 @@ namespace NotesApp.WinForms.Forms
         {
             _note = note;
             InitializeComponent();
+
+            // Подписываемся на изменение языка
+            LocalizationManager.LanguageChanged += OnLanguageChanged;
+
             LoadNote();
+        }
+
+        private void OnLanguageChanged(object sender, EventArgs e)
+        {
+            LoadNote();
+        }
+
+        protected override void OnFormClosed(FormClosedEventArgs e)
+        {
+            LocalizationManager.LanguageChanged -= OnLanguageChanged;
+            base.OnFormClosed(e);
         }
 
         private void LoadNote()
         {
-            this.Text = _note.Title;
+            this.Text = LocalizationManager.GetString("ViewNote");
             lblTitle.Text = _note.Title;
 
-            lblDate.Text = $"Создано: {_note.CreatedAt:dd.MM.yyyy HH:mm}\nОбновлено: {_note.UpdatedAt:dd.MM.yyyy HH:mm}";
+            lblDate.Text = string.Format("{0}: {1:dd.MM.yyyy HH:mm}\n{2}: {3:dd.MM.yyyy HH:mm}",
+                LocalizationManager.GetString("Created"),
+                _note.CreatedAt,
+                LocalizationManager.GetString("Updated"),
+                _note.UpdatedAt);
 
             txtContent.Text = _note.Content;
 
             // Очищаем панель тегов
             flpTags.Controls.Clear();
 
-            // Добавляем заголовок для тегов (увеличенный)
+            // Добавляем заголовок для тегов
             var lblTagsHeader = new Label
             {
-                Text = "Теги:",
+                Text = LocalizationManager.GetString("Tags_Header"),
                 Font = new Font("Microsoft Sans Serif", 11, FontStyle.Bold),
                 AutoSize = true,
                 Padding = new Padding(5),
@@ -41,15 +60,14 @@ namespace NotesApp.WinForms.Forms
             };
             flpTags.Controls.Add(lblTagsHeader);
 
-
-            // Отображаем теги в виде красивых кнопок/меток
+            // Отображаем теги
             if (_note.Tags != null && _note.Tags.Any())
             {
                 foreach (var tag in _note.Tags)
                 {
                     var lblTag = new Label
                     {
-                        Text = $"  {tag}  ", // Добавляем пробелы для отступов
+                        Text = $"  {tag}  ",
                         AutoSize = true,
                         Padding = new Padding(8, 5, 8, 5),
                         Margin = new Padding(5, 3, 5, 3),
@@ -59,17 +77,15 @@ namespace NotesApp.WinForms.Forms
                         TextAlign = ContentAlignment.MiddleCenter
                     };
 
-                    // Добавляем всплывающую подсказку
                     var toolTip = new ToolTip();
                     toolTip.SetToolTip(lblTag, $"Тег: {tag}");
 
                     flpTags.Controls.Add(lblTag);
                 }
 
-                // Добавляем информацию о количестве тегов
                 var lblTagCount = new Label
                 {
-                    Text = $"Всего тегов: {_note.Tags.Count}",
+                    Text = string.Format(LocalizationManager.GetString("TotalTags"), _note.Tags.Count),
                     Font = new Font("Microsoft Sans Serif", 9, FontStyle.Italic),
                     AutoSize = true,
                     Padding = new Padding(5),
@@ -82,7 +98,7 @@ namespace NotesApp.WinForms.Forms
             {
                 var lblNoTags = new Label
                 {
-                    Text = "Нет тегов",
+                    Text = LocalizationManager.GetString("NoTags_"),
                     AutoSize = true,
                     Padding = new Padding(10, 8, 10, 8),
                     ForeColor = Color.Gray,
@@ -92,6 +108,8 @@ namespace NotesApp.WinForms.Forms
                 };
                 flpTags.Controls.Add(lblNoTags);
             }
+
+            btnClose.Text = LocalizationManager.GetString("Close");
         }
 
         private void BtnClose_Click(object sender, EventArgs e)

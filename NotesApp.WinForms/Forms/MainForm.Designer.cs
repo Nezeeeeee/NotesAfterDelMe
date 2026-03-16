@@ -17,6 +17,7 @@ namespace NotesApp.WinForms.Forms
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.Panel pnlTags;
         private System.Windows.Forms.FlowLayoutPanel flpTagFilters;
+        private System.Windows.Forms.ComboBox cmbLanguage;
 
         protected override void Dispose(bool disposing)
         {
@@ -51,9 +52,8 @@ namespace NotesApp.WinForms.Forms
             actionPanel.SuspendLayout();
             pnlTags.SuspendLayout();
             SuspendLayout();
-            // 
+
             // searchPanel
-            // 
             searchPanel.Controls.Add(lblSearch);
             searchPanel.Controls.Add(txtSearch);
             searchPanel.Controls.Add(lblTags);
@@ -66,49 +66,55 @@ namespace NotesApp.WinForms.Forms
             searchPanel.Padding = new Padding(10);
             searchPanel.Size = new Size(984, 100);
             searchPanel.TabIndex = 2;
-            // 
+
             // lblSearch
-            // 
             lblSearch.Location = new Point(10, 15);
             lblSearch.Name = "lblSearch";
             lblSearch.Size = new Size(50, 25);
             lblSearch.TabIndex = 0;
             lblSearch.Text = "Search:";
-            // 
+
             // txtSearch
-            // 
             txtSearch.Location = new Point(70, 12);
             txtSearch.Name = "txtSearch";
             txtSearch.Size = new Size(300, 23);
             txtSearch.TabIndex = 1;
-            // 
+
             // lblTags
-            // 
             lblTags.Location = new Point(380, 15);
             lblTags.Name = "lblTags";
             lblTags.Size = new Size(40, 25);
             lblTags.TabIndex = 2;
             lblTags.Text = "Tags:";
-            // 
+
             // txtTagFilter
-            // 
             txtTagFilter.Location = new Point(430, 12);
             txtTagFilter.Name = "txtTagFilter";
             txtTagFilter.PlaceholderText = "tag1, tag2, tag3";
             txtTagFilter.Size = new Size(200, 23);
             txtTagFilter.TabIndex = 3;
-            // 
+
             // btnSearch
-            // 
             btnSearch.Location = new Point(640, 10);
             btnSearch.Name = "btnSearch";
             btnSearch.Size = new Size(100, 30);
             btnSearch.TabIndex = 4;
             btnSearch.Text = "Search";
             btnSearch.Click += BtnSearch_Click;
-            // 
+
+            // cmbLanguage - переключатель языка
+            this.cmbLanguage = new ComboBox();
+            this.cmbLanguage.DropDownStyle = ComboBoxStyle.DropDownList;
+            this.cmbLanguage.Items.AddRange(new object[] { "Русский", "English" });
+            this.cmbLanguage.SelectedIndex = 0;
+            this.cmbLanguage.Location = new Point(860, 12);
+            this.cmbLanguage.Name = "cmbLanguage";
+            this.cmbLanguage.Size = new Size(100, 25);
+            this.cmbLanguage.TabIndex = 6;
+            this.cmbLanguage.SelectedIndexChanged += CmbLanguage_SelectedIndexChanged;
+            searchPanel.Controls.Add(this.cmbLanguage);
+
             // actionPanel
-            // 
             actionPanel.Controls.Add(btnAdd);
             actionPanel.Controls.Add(btnEdit);
             actionPanel.Controls.Add(btnDelete);
@@ -116,36 +122,32 @@ namespace NotesApp.WinForms.Forms
             actionPanel.Name = "actionPanel";
             actionPanel.Size = new Size(980, 40);
             actionPanel.TabIndex = 5;
-            // 
+
             // btnAdd
-            // 
             btnAdd.Location = new Point(0, 0);
             btnAdd.Name = "btnAdd";
             btnAdd.Size = new Size(100, 30);
             btnAdd.TabIndex = 0;
             btnAdd.Text = "Add Note";
             btnAdd.Click += BtnAdd_Click;
-            // 
+
             // btnEdit
-            // 
             btnEdit.Location = new Point(110, 0);
             btnEdit.Name = "btnEdit";
             btnEdit.Size = new Size(100, 30);
             btnEdit.TabIndex = 1;
             btnEdit.Text = "Edit";
             btnEdit.Click += BtnEdit_Click;
-            // 
+
             // btnDelete
-            // 
             btnDelete.Location = new Point(220, 0);
             btnDelete.Name = "btnDelete";
             btnDelete.Size = new Size(100, 30);
             btnDelete.TabIndex = 2;
             btnDelete.Text = "Delete";
             btnDelete.Click += BtnDelete_Click;
-            // 
+
             // pnlTags
-            // 
             pnlTags.BackColor = Color.WhiteSmoke;
             pnlTags.BorderStyle = BorderStyle.FixedSingle;
             pnlTags.Controls.Add(lblTagsTitle);
@@ -157,27 +159,24 @@ namespace NotesApp.WinForms.Forms
             pnlTags.Padding = new Padding(10);
             pnlTags.Size = new Size(984, 120);
             pnlTags.TabIndex = 1;
-            // 
+
             // lblTagsTitle
-            // 
             lblTagsTitle.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold);
             lblTagsTitle.Location = new Point(10, 5);
             lblTagsTitle.Name = "lblTagsTitle";
             lblTagsTitle.Size = new Size(400, 20);
             lblTagsTitle.TabIndex = 0;
             lblTagsTitle.Text = "Фильтр по тегам (выберите один или несколько):";
-            // 
+
             // btnClearTags
-            // 
             btnClearTags.Location = new Point(830, 3);
             btnClearTags.Name = "btnClearTags";
             btnClearTags.Size = new Size(120, 25);
             btnClearTags.TabIndex = 1;
             btnClearTags.Text = "Сбросить фильтр";
             btnClearTags.Click += BtnClearTags_Click;
-            // 
+
             // flpTagFilters
-            // 
             flpTagFilters.AutoScroll = true;
             flpTagFilters.BackColor = Color.White;
             flpTagFilters.Location = new Point(10, 30);
@@ -185,9 +184,8 @@ namespace NotesApp.WinForms.Forms
             flpTagFilters.Padding = new Padding(5);
             flpTagFilters.Size = new Size(960, 80);
             flpTagFilters.TabIndex = 2;
-            // 
+
             // lstNotes
-            // 
             lstNotes.DisplayMember = "Title";
             lstNotes.Dock = DockStyle.Fill;
             lstNotes.DrawMode = DrawMode.OwnerDrawVariable;
@@ -200,9 +198,8 @@ namespace NotesApp.WinForms.Forms
             lstNotes.DrawItem += LstNotes_DrawItem;
             lstNotes.MeasureItem += LstNotes_MeasureItem;
             lstNotes.SelectedIndexChanged += LstNotes_SelectedIndexChanged;
-            // 
+
             // MainForm
-            // 
             ClientSize = new Size(984, 561);
             Controls.Add(lstNotes);
             Controls.Add(pnlTags);
@@ -211,6 +208,7 @@ namespace NotesApp.WinForms.Forms
             Name = "MainForm";
             StartPosition = FormStartPosition.CenterScreen;
             Text = "Notes Manager";
+
             searchPanel.ResumeLayout(false);
             searchPanel.PerformLayout();
             actionPanel.ResumeLayout(false);
