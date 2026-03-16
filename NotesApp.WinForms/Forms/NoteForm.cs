@@ -14,14 +14,6 @@ namespace NotesApp.WinForms.Forms
         private readonly NoteDto _note;
         private List<string> _currentTags = new List<string>();
 
-        // ❌ НЕ НУЖНО объявлять поля здесь - они уже есть в Designer.cs
-        // УДАЛИТЕ эти строки:
-        // private System.Windows.Forms.TextBox txtTitle;
-        // private System.Windows.Forms.TextBox txtContent;
-        // private System.Windows.Forms.FlowLayoutPanel flpTagsContainer;
-        // private System.Windows.Forms.Button btnSave;
-        // private System.Windows.Forms.Button btnCancel;
-
         public NoteForm(INoteService noteService, NoteDto note = null)
         {
             _noteService = noteService;
@@ -58,7 +50,7 @@ namespace NotesApp.WinForms.Forms
             {
                 var tagPanel = new Panel
                 {
-                    Height = 30,
+                    Height = 35,
                     Width = 150,
                     Margin = new Padding(3),
                     BackColor = Color.LightSteelBlue,
@@ -68,20 +60,21 @@ namespace NotesApp.WinForms.Forms
                 var lblTag = new Label
                 {
                     Text = tag,
-                    Location = new Point(5, 5),
+                    Location = new Point(5, 8),
                     AutoSize = true,
-                    MaximumSize = new Size(100, 20)
+                    Font = new Font("Microsoft Sans Serif", 9)
                 };
 
                 var btnRemove = new Button
                 {
                     Text = "X",
-                    Location = new Point(120, 3),
-                    Size = new Size(20, 20),
+                    Location = new Point(115, 5),
+                    Size = new Size(25, 25),
                     FlatStyle = FlatStyle.Flat,
                     BackColor = Color.IndianRed,
                     ForeColor = Color.White,
-                    Tag = tag
+                    Tag = tag,
+                    Font = new Font("Microsoft Sans Serif", 8, FontStyle.Bold)
                 };
                 btnRemove.Click += BtnRemoveTag_Click;
 
@@ -93,23 +86,27 @@ namespace NotesApp.WinForms.Forms
             // Поле для добавления нового тега
             var addPanel = new Panel
             {
-                Height = 30,
-                Width = 200,
+                Height = 35,
+                Width = 220,
                 Margin = new Padding(3)
             };
 
             var txtNewTag = new TextBox
             {
-                Location = new Point(0, 3),
-                Width = 150,
-                PlaceholderText = "новый тег"
+                Location = new Point(0, 5),
+                Width = 160,
+                PlaceholderText = "новый тег",
+                Font = new Font("Microsoft Sans Serif", 9)
             };
 
             var btnAdd = new Button
             {
                 Text = "+",
-                Location = new Point(155, 3),
-                Size = new Size(25, 22)
+                Location = new Point(165, 5),
+                Size = new Size(30, 25),
+                Font = new Font("Microsoft Sans Serif", 10, FontStyle.Bold),
+                BackColor = Color.LightGreen,
+                FlatStyle = FlatStyle.Flat
             };
             btnAdd.Click += (s, e) => BtnAddTag_Click(txtNewTag.Text);
 

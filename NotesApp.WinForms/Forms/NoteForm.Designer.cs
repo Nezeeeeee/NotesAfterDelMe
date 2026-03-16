@@ -4,7 +4,7 @@
     {
         private System.ComponentModel.IContainer components = null;
 
-        // Объявляем все поля класса (ТОЛЬКО ЗДЕСЬ!)
+        // Объявляем все поля класса
         private System.Windows.Forms.TextBox txtTitle;
         private System.Windows.Forms.TextBox txtContent;
         private System.Windows.Forms.FlowLayoutPanel flpTagsContainer;
@@ -30,60 +30,73 @@
             System.Windows.Forms.Label lblContent = new System.Windows.Forms.Label();
             System.Windows.Forms.Label lblTags = new System.Windows.Forms.Label();
 
-            // NoteForm
-            this.Size = new System.Drawing.Size(700, 600);
+            // NoteForm - УВЕЛИЧИВАЕМ ШИРИНУ
+            this.Size = new System.Drawing.Size(820, 620);
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
+            this.MinimizeBox = false;
 
             // lblTitle
             lblTitle.Text = "Title:";
-            lblTitle.Location = new System.Drawing.Point(10, 10);
-            lblTitle.Size = new System.Drawing.Size(50, 25);
+            lblTitle.Location = new System.Drawing.Point(20, 20);
+            lblTitle.Size = new System.Drawing.Size(45, 20);
+            lblTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
 
             // txtTitle
             this.txtTitle = new System.Windows.Forms.TextBox();
-            this.txtTitle.Location = new System.Drawing.Point(70, 10);
-            this.txtTitle.Size = new System.Drawing.Size(600, 25);
+            this.txtTitle.Location = new System.Drawing.Point(80, 18);
+            this.txtTitle.Size = new System.Drawing.Size(710, 25);
+            this.txtTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
 
             // lblContent
             lblContent.Text = "Content:";
-            lblContent.Location = new System.Drawing.Point(10, 45);
-            lblContent.Size = new System.Drawing.Size(50, 25);
+            lblContent.Location = new System.Drawing.Point(20, 60);
+            lblContent.Size = new System.Drawing.Size(55, 20);
+            lblContent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
 
             // txtContent
             this.txtContent = new System.Windows.Forms.TextBox();
-            this.txtContent.Location = new System.Drawing.Point(70, 45);
-            this.txtContent.Size = new System.Drawing.Size(600, 350);
+            this.txtContent.Location = new System.Drawing.Point(80, 58);
+            this.txtContent.Size = new System.Drawing.Size(710, 350);
             this.txtContent.Multiline = true;
             this.txtContent.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.txtContent.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
 
             // lblTags
             lblTags.Text = "Tags:";
-            lblTags.Location = new System.Drawing.Point(10, 410);
-            lblTags.Size = new System.Drawing.Size(50, 25);
+            lblTags.Location = new System.Drawing.Point(20, 430);
+            lblTags.Size = new System.Drawing.Size(45, 20);
+            lblTags.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
 
             // flpTagsContainer - контейнер для тегов
             this.flpTagsContainer = new System.Windows.Forms.FlowLayoutPanel();
-            this.flpTagsContainer.Location = new System.Drawing.Point(70, 410);
-            this.flpTagsContainer.Size = new System.Drawing.Size(600, 120);
+            this.flpTagsContainer.Location = new System.Drawing.Point(80, 428);
+            this.flpTagsContainer.Size = new System.Drawing.Size(710, 100);
             this.flpTagsContainer.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.flpTagsContainer.AutoScroll = true;
-            this.flpTagsContainer.Padding = new System.Windows.Forms.Padding(5);
+            this.flpTagsContainer.Padding = new System.Windows.Forms.Padding(8);
+            this.flpTagsContainer.BackColor = System.Drawing.Color.WhiteSmoke;
 
             // btnSave
             this.btnSave = new System.Windows.Forms.Button();
             this.btnSave.Text = "Save";
-            this.btnSave.Location = new System.Drawing.Point(500, 540);
-            this.btnSave.Size = new System.Drawing.Size(80, 30);
+            this.btnSave.Location = new System.Drawing.Point(590, 545);
+            this.btnSave.Size = new System.Drawing.Size(95, 35);
+            this.btnSave.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
+            this.btnSave.BackColor = System.Drawing.Color.LightSteelBlue;
+            this.btnSave.FlatStyle = FlatStyle.Flat;
             this.btnSave.DialogResult = System.Windows.Forms.DialogResult.OK;
             this.btnSave.Click += new System.EventHandler(this.BtnSave_Click);
 
             // btnCancel
             this.btnCancel = new System.Windows.Forms.Button();
             this.btnCancel.Text = "Cancel";
-            this.btnCancel.Location = new System.Drawing.Point(590, 540);
-            this.btnCancel.Size = new System.Drawing.Size(80, 30);
+            this.btnCancel.Location = new System.Drawing.Point(695, 545);
+            this.btnCancel.Size = new System.Drawing.Size(95, 35);
+            this.btnCancel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10);
+            this.btnCancel.BackColor = System.Drawing.Color.LightGray;
+            this.btnCancel.FlatStyle = FlatStyle.Flat;
             this.btnCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
 
             // Добавляем контролы на форму
