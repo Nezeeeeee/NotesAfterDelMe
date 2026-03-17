@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Drawing;
 
 namespace NotesApp.WinForms
 {
@@ -41,50 +42,50 @@ namespace NotesApp.WinForms
             ThemeChanged?.Invoke(null, EventArgs.Empty);
         }
 
-        public static System.Drawing.Color GetColor(string colorName)
+        public static Color GetColor(string colorName)
         {
             if (_currentTheme == "dark")
             {
                 return colorName switch
                 {
-                    "Background" => System.Drawing.Color.FromArgb(32, 32, 32),
-                    "Foreground" => System.Drawing.Color.FromArgb(220, 220, 220),
-                    "PanelBackground" => System.Drawing.Color.FromArgb(45, 45, 45),
-                    "PanelBorder" => System.Drawing.Color.FromArgb(64, 64, 64),
-                    "ButtonBackground" => System.Drawing.Color.FromArgb(70, 70, 70),
-                    "ButtonHover" => System.Drawing.Color.FromArgb(90, 90, 90),
-                    "ButtonText" => System.Drawing.Color.FromArgb(240, 240, 240),
-                    "SelectedItem" => System.Drawing.Color.FromArgb(75, 110, 175),
-                    "TagBackground" => System.Drawing.Color.FromArgb(80, 100, 120),
-                    "TagText" => System.Drawing.Color.FromArgb(240, 240, 240),
-                    "DateText" => System.Drawing.Color.FromArgb(150, 150, 150),
-                    "HeaderBackground" => System.Drawing.Color.FromArgb(55, 55, 55),
-                    "InputBackground" => System.Drawing.Color.FromArgb(40, 40, 40),
-                    "InputForeground" => System.Drawing.Color.FromArgb(240, 240, 240),
-                    "BorderColor" => System.Drawing.Color.FromArgb(80, 80, 80),
-                    _ => System.Drawing.Color.FromArgb(32, 32, 32)
+                    "Background" => Color.FromArgb(32, 32, 32),
+                    "Foreground" => Color.FromArgb(220, 220, 220),
+                    "PanelBackground" => Color.FromArgb(45, 45, 45),
+                    "PanelBorder" => Color.FromArgb(64, 64, 64),
+                    "ButtonBackground" => Color.FromArgb(70, 70, 70),
+                    "ButtonHover" => Color.FromArgb(90, 90, 90),
+                    "ButtonText" => Color.FromArgb(240, 240, 240),
+                    "SelectedItem" => Color.FromArgb(75, 110, 175),
+                    "TagBackground" => Color.FromArgb(80, 100, 120),
+                    "TagText" => Color.FromArgb(240, 240, 240),
+                    "DateText" => Color.FromArgb(150, 150, 150),
+                    "HeaderBackground" => Color.FromArgb(55, 55, 55),
+                    "InputBackground" => Color.FromArgb(40, 40, 40),
+                    "InputForeground" => Color.FromArgb(240, 240, 240),
+                    "BorderColor" => Color.FromArgb(80, 80, 80),
+                    _ => Color.FromArgb(32, 32, 32)
                 };
             }
             else
             {
                 return colorName switch
                 {
-                    "Background" => System.Drawing.Color.FromArgb(240, 240, 240),
-                    "Foreground" => System.Drawing.Color.FromArgb(32, 32, 32),
-                    "PanelBackground" => System.Drawing.Color.FromArgb(250, 250, 250),
-                    "PanelBorder" => System.Drawing.Color.FromArgb(200, 200, 200),
-                    "ButtonBackground" => System.Drawing.Color.FromArgb(230, 230, 230),
-                    "ButtonHover" => System.Drawing.Color.FromArgb(210, 210, 210),
-                    "ButtonText" => System.Drawing.Color.FromArgb(32, 32, 32),
-                    "SelectedItem" => System.Drawing.Color.FromArgb(173, 216, 230),
-                    "TagBackground" => System.Drawing.Color.FromArgb(176, 196, 222),
-                    "TagText" => System.Drawing.Color.FromArgb(32, 32, 32),
-                    "DateText" => System.Drawing.Color.FromArgb(105, 105, 105),
-                    "HeaderBackground" => System.Drawing.Color.FromArgb(230, 230, 250),
-                    "InputBackground" => System.Drawing.Color.FromArgb(255, 255, 255),
-                    "InputForeground" => System.Drawing.Color.FromArgb(32, 32, 32),
-                    "BorderColor" => System.Drawing.Color.FromArgb(200, 200, 200),
-                    _ => System.Drawing.Color.FromArgb(240, 240, 240)
+                    "Background" => Color.FromArgb(240, 240, 240),
+                    "Foreground" => Color.FromArgb(32, 32, 32),
+                    "PanelBackground" => Color.FromArgb(250, 250, 250),
+                    "PanelBorder" => Color.FromArgb(200, 200, 200),
+                    "ButtonBackground" => Color.FromArgb(230, 230, 230),
+                    "ButtonHover" => Color.FromArgb(210, 210, 210),
+                    "ButtonText" => Color.FromArgb(32, 32, 32),
+                    "SelectedItem" => Color.FromArgb(173, 216, 230),
+                    "TagBackground" => Color.FromArgb(176, 196, 222),
+                    "TagText" => Color.FromArgb(32, 32, 32),
+                    "DateText" => Color.FromArgb(105, 105, 105),
+                    "HeaderBackground" => Color.FromArgb(230, 230, 250),
+                    "InputBackground" => Color.FromArgb(255, 255, 255),
+                    "InputForeground" => Color.FromArgb(32, 32, 32),
+                    "BorderColor" => Color.FromArgb(200, 200, 200),
+                    _ => Color.FromArgb(240, 240, 240)
                 };
             }
         }
@@ -115,11 +116,25 @@ namespace NotesApp.WinForms
                     { "LightTheme", "Light" },
                     { "DarkTheme", "Dark" },
                     { "File", "File" },
+                    { "Export", "Export" },
+                    { "ExportAllNotes", "Export All Notes" },
+                    { "ExportFiltered", "Export Filtered" },
                     { "About", "About" },
                     { "AboutTitle", "About Program" },
                     { "Version", "Version" },
                     { "Author", "Author" },
                     { "AppDescription", "Notes management application with tag support, search, multi-select and theme switching." },
+                    { "ExcelExported", "Notes exported to Excel successfully!" },
+                    { "ExcelExportError", "Error exporting to Excel: {0}" },
+                    { "ExcelFiles", "Excel Files" },
+                    { "NoNotesToExport", "No notes to export" },
+                    { "NoFilterActive", "No active filters. Showing all notes." },
+                    { "Success", "Success" },
+                    { "Information", "Information" },
+                    { "Question", "Question" },
+                    { "OpenFileQuestion", "Open file?" },
+                    { "Error", "Error" },
+                    { "NoNotesFound", "No notes found" },
                     
                     // NoteForm
                     { "EditNote", "Edit Note" },
@@ -167,11 +182,25 @@ namespace NotesApp.WinForms
                     { "LightTheme", "Светлая" },
                     { "DarkTheme", "Темная" },
                     { "File", "Файл" },
+                    { "Export", "Экспорт" },
+                    { "ExportAllNotes", "Экспорт всех заметок" },
+                    { "ExportFiltered", "Экспорт отфильтрованных" },
                     { "About", "О программе" },
                     { "AboutTitle", "О программе" },
                     { "Version", "Версия" },
                     { "Author", "Автор" },
                     { "AppDescription", "Приложение для управления заметками с поддержкой тегов, поиска, множественного выбора и смены темы." },
+                    { "ExcelExported", "Заметки успешно экспортированы в Excel!" },
+                    { "ExcelExportError", "Ошибка при экспорте в Excel: {0}" },
+                    { "ExcelFiles", "Файлы Excel" },
+                    { "NoNotesToExport", "Нет заметок для экспорта" },
+                    { "NoFilterActive", "Нет активных фильтров. Показаны все заметки." },
+                    { "Success", "Успех" },
+                    { "Information", "Информация" },
+                    { "Question", "Вопрос" },
+                    { "OpenFileQuestion", "Открыть файл?" },
+                    { "Error", "Ошибка" },
+                    { "NoNotesFound", "Заметки не найдены" },
                     
                     // NoteForm
                     { "EditNote", "Редактирование" },

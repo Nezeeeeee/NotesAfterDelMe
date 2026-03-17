@@ -84,8 +84,26 @@ namespace NotesApp.Application.Services
 
         public async Task<IEnumerable<NoteDto>> SearchNotesAsync(string searchTerm, List<string> tags)
         {
-            var notes = await _noteRepository.SearchAsync(searchTerm, tags);
-            return notes.Select(n => MapToDto(n));
+            var allNotes = await _noteRepository.GetAllAsync();
+            var filteredNotes = allNotes.AsEnumerable();
+
+            // Фильтр по тегам - заметка должна содержать ВСЕ выбранные теги
+            if (tags != null && tags.Any())
+            {
+                filteredNotes = filteredNotes.Where(n =>
+                    tags.All(tag => n.Tags.Any(t => t.Name.Equals(tag, StringComparison.OrdinalIgnoreCase))));
+            }
+
+            // Фильтр по тексту
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                string searchLower = searchTerm.ToLower();
+                filteredNotes = filteredNotes.Where(n =>
+                    (!string.IsNullOrEmpty(n.Title) && n.Title.ToLower().Contains(searchLower)) ||
+                    (!string.IsNullOrEmpty(n.Content) && n.Content.ToLower().Contains(searchLower)));
+            }
+
+            return filteredNotes.Select(n => MapToDto(n));
         }
 
         private NoteDto MapToDto(Note note)

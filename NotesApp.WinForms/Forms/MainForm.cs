@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using NotesApp.Application.DTOs;
 using NotesApp.Application.Interfaces;
+using NotesApp.WinForms.Services;
 
 namespace NotesApp.WinForms.Forms
 {
@@ -14,23 +15,29 @@ namespace NotesApp.WinForms.Forms
         private readonly INoteService _noteService;
         private List<NoteDto> _currentNotes = new List<NoteDto>();
         private List<string> _selectedTags = new List<string>();
-        // ❌ УДАЛЕНО: private System.Windows.Forms.ComboBox cmbTheme; (это поле уже есть в Designer.cs)
 
         public MainForm(INoteService noteService)
         {
-            _noteService = noteService;
-            InitializeComponent();
+            try
+            {
+                _noteService = noteService;
+                InitializeComponent();
 
-            // Подписываемся на двойной клик
-            this.lstNotes.DoubleClick += LstNotes_DoubleClick;
+                // Подписываемся на двойной клик
+                this.lstNotes.DoubleClick += LstNotes_DoubleClick;
 
-            // Подписываемся на изменение темы
-            LocalizationManager.ThemeChanged += OnThemeChanged;
+                // Подписываемся на изменение темы
+                LocalizationManager.ThemeChanged += OnThemeChanged;
 
-            // Устанавливаем начальный язык
-            SetInitialLanguage();
+                // Устанавливаем начальный язык
+                SetInitialLanguage();
 
-            LoadNotesAsync(); // Может быть проблема, если LocalizationManager не инициализирован
+                LoadNotesAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при инициализации: {ex.Message}\n{ex.StackTrace}");
+            }
         }
 
         private void SetInitialLanguage()
@@ -51,6 +58,8 @@ namespace NotesApp.WinForms.Forms
             _currentNotes = (await _noteService.GetAllNotesAsync()).ToList();
             RefreshNotesList();
             await LoadAllTagsAsync();
+            UpdateSearchResultInfo();
+            UpdateSelectedTagsDisplay();
         }
 
         private async Task LoadAllTagsAsync()
@@ -158,7 +167,10 @@ namespace NotesApp.WinForms.Forms
         private void ChkBox_CheckedChanged(object sender, EventArgs e)
         {
             var chkBox = sender as CheckBox;
-            var tag = chkBox.Tag.ToString();
+            if (chkBox == null) return;
+
+            var tag = chkBox.Tag?.ToString();
+            if (string.IsNullOrEmpty(tag)) return;
 
             if (chkBox.Checked)
             {
@@ -170,23 +182,42 @@ namespace NotesApp.WinForms.Forms
                 _selectedTags.Remove(tag);
             }
 
+            UpdateSelectedTagsDisplay();
             FilterNotesAsync();
         }
 
         private async void FilterNotesAsync()
         {
-            if (_selectedTags.Any() || !string.IsNullOrWhiteSpace(txtSearch.Text))
+            try
             {
-                _currentNotes = (await _noteService.SearchNotesAsync(
-                    txtSearch.Text,
-                    _selectedTags)).ToList();
-            }
-            else
-            {
-                _currentNotes = (await _noteService.GetAllNotesAsync()).ToList();
-            }
+                Cursor = Cursors.WaitCursor;
 
-            RefreshNotesList();
+                List<NoteDto> filteredNotes;
+
+                if (_selectedTags.Any() || !string.IsNullOrWhiteSpace(txtSearch.Text))
+                {
+                    filteredNotes = (await _noteService.SearchNotesAsync(
+                        txtSearch.Text,
+                        _selectedTags)).ToList();
+                }
+                else
+                {
+                    filteredNotes = (await _noteService.GetAllNotesAsync()).ToList();
+                }
+
+                _currentNotes = filteredNotes;
+                RefreshNotesList();
+                UpdateSearchResultInfo();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Ошибка при фильтрации: {ex.Message}", "Ошибка",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            finally
+            {
+                Cursor = Cursors.Default;
+            }
         }
 
         private void RefreshNotesList()
@@ -195,12 +226,80 @@ namespace NotesApp.WinForms.Forms
             lstNotes.DataSource = _currentNotes;
         }
 
+        private void UpdateSearchResultInfo()
+        {
+            if (lblSearchInfo == null) return;
+
+            string infoText;
+
+            if (_selectedTags.Any() || !string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                if (_currentNotes.Count == 0)
+                {
+                    infoText = LocalizationManager.GetString("NoNotesFound");
+                }
+                else
+                {
+                    string notesCount = _currentNotes.Count.ToString();
+                    string tagsCount = _selectedTags.Count.ToString();
+
+                    if (LocalizationManager.CurrentLanguage == "ru")
+                        infoText = $"Найдено заметок: {notesCount} | Выбрано тегов: {tagsCount}";
+                    else
+                        infoText = $"Found notes: {notesCount} | Selected tags: {tagsCount}";
+                }
+            }
+            else
+            {
+                string totalNotes = _currentNotes.Count.ToString();
+
+                if (LocalizationManager.CurrentLanguage == "ru")
+                    infoText = $"Всего заметок: {totalNotes}";
+                else
+                    infoText = $"Total notes: {totalNotes}";
+            }
+
+            lblSearchInfo.Text = infoText;
+        }
+
+        private void UpdateSelectedTagsDisplay()
+        {
+            if (lblSelectedTags == null) return;
+
+            if (_selectedTags.Any())
+            {
+                string selectedTagsText = string.Join(", ", _selectedTags);
+
+                if (LocalizationManager.CurrentLanguage == "ru")
+                    lblSelectedTags.Text = $"Выбрано: {selectedTagsText}";
+                else
+                    lblSelectedTags.Text = $"Selected: {selectedTagsText}";
+
+                lblSelectedTags.Visible = true;
+
+                // Принудительно обновляем отображение
+                lblSelectedTags.Invalidate();
+                lblSelectedTags.Refresh();
+
+                // Логируем для отладки (можно удалить позже)
+                System.Diagnostics.Debug.WriteLine($"Selected tags: {selectedTagsText}");
+                System.Diagnostics.Debug.WriteLine($"Label text: {lblSelectedTags.Text}");
+                System.Diagnostics.Debug.WriteLine($"Label size: {lblSelectedTags.Size}");
+            }
+            else
+            {
+                lblSelectedTags.Visible = false;
+                lblSelectedTags.Text = "";
+            }
+        }
+
         private void LstNotes_DrawItem(object sender, DrawItemEventArgs e)
         {
             if (e.Index < 0) return;
 
             var listBox = sender as ListBox;
-            var note = listBox.Items[e.Index] as NoteDto;
+            var note = listBox?.Items[e.Index] as NoteDto;
+            if (note == null) return;
 
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             {
@@ -279,8 +378,12 @@ namespace NotesApp.WinForms.Forms
                 .Where(t => !string.IsNullOrWhiteSpace(t))
                 .ToList();
 
+            _selectedTags = tags;
+            UpdateSelectedTagsDisplay();
+
             _currentNotes = (await _noteService.SearchNotesAsync(searchTerm, tags)).ToList();
             RefreshNotesList();
+            UpdateSearchResultInfo();
         }
 
         private void BtnAdd_Click(object sender, EventArgs e)
@@ -340,7 +443,7 @@ namespace NotesApp.WinForms.Forms
 
             txtSearch.Text = "";
             txtTagFilter.Text = "";
-
+            UpdateSelectedTagsDisplay();
             LoadNotesAsync();
         }
 
@@ -370,18 +473,25 @@ namespace NotesApp.WinForms.Forms
             lblTagsTitle.Text = LocalizationManager.GetString("TagsFilterTitle");
             btnClearTags.Text = LocalizationManager.GetString("ClearFilter");
 
-            // Обновляем меню
-            fileMenu.Text = LocalizationManager.GetString("File");
-            aboutMenuItem.Text = LocalizationManager.GetString("About");
+            if (fileMenu != null)
+                fileMenu.Text = LocalizationManager.GetString("File");
+            if (exportMenu != null)
+                exportMenu.Text = LocalizationManager.GetString("Export");
+            if (exportAllNotesMenuItem != null)
+                exportAllNotesMenuItem.Text = LocalizationManager.GetString("ExportAllNotes");
+            if (exportFilteredMenuItem != null)
+                exportFilteredMenuItem.Text = LocalizationManager.GetString("ExportFiltered");
+            if (aboutMenuItem != null)
+                aboutMenuItem.Text = LocalizationManager.GetString("About");
 
             if (cmbTheme != null)
             {
                 int selectedIndex = cmbTheme.SelectedIndex;
                 cmbTheme.Items.Clear();
                 cmbTheme.Items.AddRange(new object[] {
-            LocalizationManager.GetString("LightTheme"),
-            LocalizationManager.GetString("DarkTheme")
-        });
+                    LocalizationManager.GetString("LightTheme"),
+                    LocalizationManager.GetString("DarkTheme")
+                });
 
                 if (selectedIndex >= 0 && selectedIndex < cmbTheme.Items.Count)
                 {
@@ -393,6 +503,8 @@ namespace NotesApp.WinForms.Forms
                 }
             }
 
+            UpdateSearchResultInfo();
+            UpdateSelectedTagsDisplay();
             LoadAllTagsAsync();
         }
 
@@ -415,22 +527,19 @@ namespace NotesApp.WinForms.Forms
 
         private void ApplyThemeToAllForms()
         {
-            // Применяем тему к главной форме
             ApplyTheme(this);
 
-            // Применяем тему ко всем открытым формам
-            // Используем полное имя System.Windows.Forms.Application.OpenForms
             foreach (Form form in System.Windows.Forms.Application.OpenForms)
             {
                 if (form != this)
                 {
                     if (form is NoteForm noteForm)
                     {
-                        ApplyTheme(noteForm);
+                        noteForm.ApplyTheme();
                     }
                     else if (form is ViewNoteForm viewForm)
                     {
-                        ApplyTheme(viewForm);
+                        viewForm.ApplyTheme();
                     }
                 }
             }
@@ -475,14 +584,6 @@ namespace NotesApp.WinForms.Forms
 
                 mainForm.lstNotes.Invalidate();
             }
-            else if (form is NoteForm noteForm)
-            {
-                noteForm.ApplyTheme();
-            }
-            else if (form is ViewNoteForm viewForm)
-            {
-                viewForm.ApplyTheme();
-            }
         }
 
         private void AboutMenuItem_Click(object sender, EventArgs e)
@@ -490,6 +591,97 @@ namespace NotesApp.WinForms.Forms
             using (var aboutForm = new AboutForm())
             {
                 aboutForm.ShowDialog();
+            }
+        }
+
+        private void ExportAllNotesMenuItem_Click(object sender, EventArgs e)
+        {
+            ExportNotes(_currentNotes, "all_notes");
+        }
+
+        private void ExportFilteredMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_selectedTags.Any() || !string.IsNullOrWhiteSpace(txtSearch.Text))
+            {
+                ExportNotes(_currentNotes, "filtered_notes");
+            }
+            else
+            {
+                MessageBox.Show(
+                    LocalizationManager.GetString("NoFilterActive"),
+                    LocalizationManager.GetString("Information"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+            }
+        }
+
+        private void ExportNotes(List<NoteDto> notes, string defaultName)
+        {
+            if (notes == null || notes.Count == 0)
+            {
+                MessageBox.Show(
+                    LocalizationManager.GetString("NoNotesToExport"),
+                    LocalizationManager.GetString("Information"),
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information);
+                return;
+            }
+
+            using (SaveFileDialog saveDialog = new SaveFileDialog())
+            {
+                saveDialog.Filter = $"{LocalizationManager.GetString("ExcelFiles")} (*.xlsx)|*.xlsx|All files (*.*)|*.*";
+                saveDialog.DefaultExt = "xlsx";
+                saveDialog.FileName = $"{defaultName}_{DateTime.Now:yyyyMMdd_HHmmss}.xlsx";
+
+                if (saveDialog.ShowDialog() == DialogResult.OK)
+                {
+                    try
+                    {
+                        ExportService.ExportNotesToExcel(notes, saveDialog.FileName);
+
+                        DialogResult result = MessageBox.Show(
+                            LocalizationManager.GetString("ExcelExported") + "\n\n" + LocalizationManager.GetString("OpenFileQuestion"),
+                            LocalizationManager.GetString("Success"),
+                            MessageBoxButtons.YesNo,
+                            MessageBoxIcon.Question);
+
+                        if (result == DialogResult.Yes)
+                        {
+                            try
+                            {
+                                using (var process = new System.Diagnostics.Process())
+                                {
+                                    process.StartInfo.FileName = saveDialog.FileName;
+                                    process.StartInfo.UseShellExecute = true;
+                                    process.Start();
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                try
+                                {
+                                    System.Diagnostics.Process.Start("explorer.exe", $"\"{saveDialog.FileName}\"");
+                                }
+                                catch
+                                {
+                                    MessageBox.Show(
+                                        $"Файл сохранен по адресу:\n{saveDialog.FileName}",
+                                        LocalizationManager.GetString("Information"),
+                                        MessageBoxButtons.OK,
+                                        MessageBoxIcon.Information);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(
+                            string.Format(LocalizationManager.GetString("ExcelExportError"), ex.Message),
+                            LocalizationManager.GetString("Error"),
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Error);
+                    }
+                }
             }
         }
     }
