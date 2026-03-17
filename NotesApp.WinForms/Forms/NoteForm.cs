@@ -20,8 +20,9 @@ namespace NotesApp.WinForms.Forms
             _note = note;
             InitializeComponent();
 
-            // Подписываемся на изменение языка
+            // Подписываемся на изменение языка и темы
             LocalizationManager.LanguageChanged += OnLanguageChanged;
+            LocalizationManager.ThemeChanged += OnThemeChanged;
 
             if (_note != null)
             {
@@ -35,6 +36,7 @@ namespace NotesApp.WinForms.Forms
             }
 
             UpdateUILanguage();
+            ApplyTheme();
             RefreshTagsDisplay();
         }
 
@@ -44,16 +46,21 @@ namespace NotesApp.WinForms.Forms
             RefreshTagsDisplay();
         }
 
+        private void OnThemeChanged(object sender, EventArgs e)
+        {
+            ApplyTheme();
+            RefreshTagsDisplay();
+        }
+
         private void UpdateUILanguage()
         {
-            // Обновляем тексты контролов
             foreach (Control control in this.Controls)
             {
                 if (control is Label label)
                 {
                     if (label.Text.Contains("Title") || label.Text.Contains("Заголовок"))
                         label.Text = LocalizationManager.GetString("Title");
-                    else if (label.Text.Contains("Content") || label.Text.Contains("Содержание"))
+                    else if (label.Text.Contains("Content") || label.Text.Contains("Содержание") || label.Text.Contains("Текст"))
                         label.Text = LocalizationManager.GetString("Content");
                     else if (label.Text.Contains("Tags") || label.Text.Contains("Теги"))
                         label.Text = LocalizationManager.GetString("Tags_");
@@ -64,9 +71,42 @@ namespace NotesApp.WinForms.Forms
             btnCancel.Text = LocalizationManager.GetString("Cancel");
         }
 
+        public void ApplyTheme()
+        {
+            this.BackColor = LocalizationManager.GetColor("Background");
+            this.ForeColor = LocalizationManager.GetColor("Foreground");
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is TextBox textBox)
+                {
+                    textBox.BackColor = LocalizationManager.GetColor("InputBackground");
+                    textBox.ForeColor = LocalizationManager.GetColor("InputForeground");
+                    textBox.BorderStyle = BorderStyle.FixedSingle;
+                }
+                else if (control is Button button)
+                {
+                    button.BackColor = LocalizationManager.GetColor("ButtonBackground");
+                    button.ForeColor = LocalizationManager.GetColor("ButtonText");
+                    button.FlatStyle = FlatStyle.Flat;
+                    button.FlatAppearance.BorderColor = LocalizationManager.GetColor("BorderColor");
+                    button.FlatAppearance.MouseOverBackColor = LocalizationManager.GetColor("ButtonHover");
+                }
+                else if (control is FlowLayoutPanel flp)
+                {
+                    flp.BackColor = LocalizationManager.GetColor("PanelBackground");
+                }
+                else if (control is Label label)
+                {
+                    label.ForeColor = LocalizationManager.GetColor("Foreground");
+                }
+            }
+        }
+
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             LocalizationManager.LanguageChanged -= OnLanguageChanged;
+            LocalizationManager.ThemeChanged -= OnThemeChanged;
             base.OnFormClosed(e);
         }
 
@@ -76,12 +116,10 @@ namespace NotesApp.WinForms.Forms
             txtContent.Text = _note.Content;
         }
 
-        private void RefreshTagsDisplay()
+        public void RefreshTagsDisplay()
         {
-            // Очищаем контейнер с тегами
             flpTagsContainer.Controls.Clear();
 
-            // Отображаем каждый тег как отдельный элемент с кнопкой удаления
             foreach (var tag in _currentTags)
             {
                 var tagPanel = new Panel
@@ -89,7 +127,7 @@ namespace NotesApp.WinForms.Forms
                     Height = 35,
                     Width = 150,
                     Margin = new Padding(3),
-                    BackColor = Color.LightSteelBlue,
+                    BackColor = LocalizationManager.GetColor("TagBackground"),
                     BorderStyle = BorderStyle.FixedSingle
                 };
 
@@ -98,7 +136,8 @@ namespace NotesApp.WinForms.Forms
                     Text = tag,
                     Location = new Point(5, 8),
                     AutoSize = true,
-                    Font = new Font("Microsoft Sans Serif", 9)
+                    Font = new Font("Microsoft Sans Serif", 9),
+                    ForeColor = LocalizationManager.GetColor("TagText")
                 };
 
                 var btnRemove = new Button
@@ -119,7 +158,6 @@ namespace NotesApp.WinForms.Forms
                 flpTagsContainer.Controls.Add(tagPanel);
             }
 
-            // Поле для добавления нового тега
             var addPanel = new Panel
             {
                 Height = 35,
@@ -132,7 +170,9 @@ namespace NotesApp.WinForms.Forms
                 Location = new Point(0, 5),
                 Width = 160,
                 PlaceholderText = LocalizationManager.GetString("NewTagPlaceholder"),
-                Font = new Font("Microsoft Sans Serif", 9)
+                Font = new Font("Microsoft Sans Serif", 9),
+                BackColor = LocalizationManager.GetColor("InputBackground"),
+                ForeColor = LocalizationManager.GetColor("InputForeground")
             };
 
             var btnAdd = new Button

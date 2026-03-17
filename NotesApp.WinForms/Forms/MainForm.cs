@@ -14,6 +14,7 @@ namespace NotesApp.WinForms.Forms
         private readonly INoteService _noteService;
         private List<NoteDto> _currentNotes = new List<NoteDto>();
         private List<string> _selectedTags = new List<string>();
+        // ❌ УДАЛЕНО: private System.Windows.Forms.ComboBox cmbTheme; (это поле уже есть в Designer.cs)
 
         public MainForm(INoteService noteService)
         {
@@ -23,25 +24,25 @@ namespace NotesApp.WinForms.Forms
             // Подписываемся на двойной клик
             this.lstNotes.DoubleClick += LstNotes_DoubleClick;
 
-            // Устанавливаем начальный язык в соответствии с выбранным в комбобоксе
+            // Подписываемся на изменение темы
+            LocalizationManager.ThemeChanged += OnThemeChanged;
+
+            // Устанавливаем начальный язык
             SetInitialLanguage();
 
-            LoadNotesAsync();
+            LoadNotesAsync(); // Может быть проблема, если LocalizationManager не инициализирован
         }
 
         private void SetInitialLanguage()
         {
-            // Устанавливаем язык в соответствии с выбранным в комбобоксе
-            if (cmbLanguage.SelectedIndex == 0) // Русский
+            if (cmbLanguage.SelectedIndex == 0)
             {
                 LocalizationManager.CurrentLanguage = "ru";
             }
-            else // English
+            else
             {
                 LocalizationManager.CurrentLanguage = "en";
             }
-
-            // Обновляем тексты на форме
             UpdateUILanguage();
         }
 
@@ -62,18 +63,16 @@ namespace NotesApp.WinForms.Forms
 
             flpTagFilters.Controls.Clear();
 
-            // Добавляем заголовок "Все теги:" с учетом языка
             var lblAllTags = new Label
             {
                 Text = LocalizationManager.GetString("AllTags"),
                 Font = new Font("Microsoft Sans Serif", 8, FontStyle.Bold),
                 AutoSize = true,
                 Padding = new Padding(5),
-                ForeColor = Color.Gray
+                ForeColor = LocalizationManager.GetColor("Foreground")
             };
             flpTagFilters.Controls.Add(lblAllTags);
 
-            // Добавляем сами теги
             foreach (var tag in allTags)
             {
                 var chkBox = new CheckBox
@@ -83,11 +82,11 @@ namespace NotesApp.WinForms.Forms
                     AutoSize = true,
                     Padding = new Padding(5),
                     Margin = new Padding(3),
-                    BackColor = Color.LightGoldenrodYellow,
+                    BackColor = LocalizationManager.GetColor("TagBackground"),
+                    ForeColor = LocalizationManager.GetColor("TagText"),
                     FlatStyle = FlatStyle.Flat
                 };
 
-                // Добавляем контекстное меню для удаления тега
                 var contextMenu = new ContextMenuStrip();
                 var deleteMenuItem = new ToolStripMenuItem(LocalizationManager.GetString("Delete"));
                 deleteMenuItem.Click += (s, e) => DeleteTag(tag);
@@ -98,7 +97,6 @@ namespace NotesApp.WinForms.Forms
                 flpTagFilters.Controls.Add(chkBox);
             }
 
-            // Если тегов нет
             if (!allTags.Any())
             {
                 var lblNoTags = new Label
@@ -106,7 +104,7 @@ namespace NotesApp.WinForms.Forms
                     Text = LocalizationManager.GetString("NoTags"),
                     AutoSize = true,
                     Padding = new Padding(5),
-                    ForeColor = Color.Gray
+                    ForeColor = LocalizationManager.GetColor("Foreground")
                 };
                 flpTagFilters.Controls.Add(lblNoTags);
             }
@@ -204,39 +202,32 @@ namespace NotesApp.WinForms.Forms
             var listBox = sender as ListBox;
             var note = listBox.Items[e.Index] as NoteDto;
 
-            // Проверяем, выбран ли элемент (наведен или выделен)
             if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
             {
-                // Заливаем фон выбранного элемента нужным цветом
-                e.Graphics.FillRectangle(new SolidBrush(Color.LightGoldenrodYellow), e.Bounds);
+                e.Graphics.FillRectangle(new SolidBrush(LocalizationManager.GetColor("SelectedItem")), e.Bounds);
             }
             else
             {
-                // Стандартный фон для невыбранных элементов
-                e.DrawBackground();
+                e.Graphics.FillRectangle(new SolidBrush(LocalizationManager.GetColor("Background")), e.Bounds);
             }
 
-            // Заголовок (жирным шрифтом)
             using (var titleFont = new Font(e.Font, FontStyle.Bold))
             {
-                e.Graphics.DrawString(note.Title, titleFont, Brushes.Black,
+                e.Graphics.DrawString(note.Title, titleFont, new SolidBrush(LocalizationManager.GetColor("Foreground")),
                     new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 5, e.Bounds.Width - 10, 20));
             }
 
-            // Дата создания/обновления
             var dateStr = note.UpdatedAt.ToString("dd.MM.yyyy HH:mm");
-            e.Graphics.DrawString(dateStr, e.Font, Brushes.Brown,
+            e.Graphics.DrawString(dateStr, e.Font, new SolidBrush(LocalizationManager.GetColor("DateText")),
                 new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 25, e.Bounds.Width - 10, 15));
 
-            // Контент (содержимое заметки)
             string content = note.Content ?? "";
             if (content.Length > 50)
                 content = content.Substring(0, 50) + "...";
 
-            e.Graphics.DrawString(content, e.Font, Brushes.Black,
+            e.Graphics.DrawString(content, e.Font, new SolidBrush(LocalizationManager.GetColor("Foreground")),
                 new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 40, e.Bounds.Width - 10, 20));
 
-            // Теги
             if (note.Tags.Any())
             {
                 string tagsStr;
@@ -250,7 +241,7 @@ namespace NotesApp.WinForms.Forms
                     tagsStr = "Tags: " + string.Join(", ", note.Tags);
                 }
 
-                e.Graphics.DrawString(tagsStr, e.Font, Brushes.DarkBlue,
+                e.Graphics.DrawString(tagsStr, e.Font, new SolidBrush(LocalizationManager.GetColor("TagText")),
                     new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 62, e.Bounds.Width - 10, 15));
             }
 
@@ -337,10 +328,8 @@ namespace NotesApp.WinForms.Forms
 
         private void BtnClearTags_Click(object sender, EventArgs e)
         {
-            // Сбрасываем все выбранные теги
             _selectedTags.Clear();
 
-            // Снимаем отметки со всех CheckBox
             foreach (Control control in flpTagFilters.Controls)
             {
                 if (control is CheckBox chkBox)
@@ -349,32 +338,28 @@ namespace NotesApp.WinForms.Forms
                 }
             }
 
-            // Очищаем поле поиска
             txtSearch.Text = "";
             txtTagFilter.Text = "";
 
-            // Загружаем все заметки
             LoadNotesAsync();
         }
 
         private void CmbLanguage_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cmbLanguage.SelectedIndex == 0) // Русский
+            if (cmbLanguage.SelectedIndex == 0)
             {
                 LocalizationManager.CurrentLanguage = "ru";
             }
-            else // English
+            else
             {
                 LocalizationManager.CurrentLanguage = "en";
             }
 
-            // Обновляем тексты на форме
             UpdateUILanguage();
         }
 
         private void UpdateUILanguage()
         {
-            // MainForm
             this.Text = LocalizationManager.GetString("MainFormTitle");
             lblSearch.Text = LocalizationManager.GetString("Search");
             lblTags.Text = LocalizationManager.GetString("Tags");
@@ -385,8 +370,127 @@ namespace NotesApp.WinForms.Forms
             lblTagsTitle.Text = LocalizationManager.GetString("TagsFilterTitle");
             btnClearTags.Text = LocalizationManager.GetString("ClearFilter");
 
-            // Обновляем заголовок "Все теги" в панели фильтров
+            // Обновляем меню
+            fileMenu.Text = LocalizationManager.GetString("File");
+            aboutMenuItem.Text = LocalizationManager.GetString("About");
+
+            if (cmbTheme != null)
+            {
+                int selectedIndex = cmbTheme.SelectedIndex;
+                cmbTheme.Items.Clear();
+                cmbTheme.Items.AddRange(new object[] {
+            LocalizationManager.GetString("LightTheme"),
+            LocalizationManager.GetString("DarkTheme")
+        });
+
+                if (selectedIndex >= 0 && selectedIndex < cmbTheme.Items.Count)
+                {
+                    cmbTheme.SelectedIndex = selectedIndex;
+                }
+                else
+                {
+                    cmbTheme.SelectedIndex = 0;
+                }
+            }
+
             LoadAllTagsAsync();
+        }
+
+        private void CmbTheme_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (cmbTheme.SelectedIndex == 0)
+            {
+                LocalizationManager.CurrentTheme = "light";
+            }
+            else
+            {
+                LocalizationManager.CurrentTheme = "dark";
+            }
+        }
+
+        private void OnThemeChanged(object sender, EventArgs e)
+        {
+            ApplyThemeToAllForms();
+        }
+
+        private void ApplyThemeToAllForms()
+        {
+            // Применяем тему к главной форме
+            ApplyTheme(this);
+
+            // Применяем тему ко всем открытым формам
+            // Используем полное имя System.Windows.Forms.Application.OpenForms
+            foreach (Form form in System.Windows.Forms.Application.OpenForms)
+            {
+                if (form != this)
+                {
+                    if (form is NoteForm noteForm)
+                    {
+                        ApplyTheme(noteForm);
+                    }
+                    else if (form is ViewNoteForm viewForm)
+                    {
+                        ApplyTheme(viewForm);
+                    }
+                }
+            }
+        }
+
+        private void ApplyTheme(Form form)
+        {
+            if (form is MainForm mainForm)
+            {
+                mainForm.BackColor = LocalizationManager.GetColor("Background");
+                mainForm.ForeColor = LocalizationManager.GetColor("Foreground");
+
+                foreach (Control control in mainForm.Controls)
+                {
+                    if (control is Panel panel)
+                    {
+                        panel.BackColor = LocalizationManager.GetColor("PanelBackground");
+                        panel.ForeColor = LocalizationManager.GetColor("Foreground");
+                    }
+                    else if (control is ListBox listBox)
+                    {
+                        listBox.BackColor = LocalizationManager.GetColor("InputBackground");
+                        listBox.ForeColor = LocalizationManager.GetColor("InputForeground");
+                    }
+                    else if (control is Button button)
+                    {
+                        button.BackColor = LocalizationManager.GetColor("ButtonBackground");
+                        button.ForeColor = LocalizationManager.GetColor("ButtonText");
+                        button.FlatAppearance.MouseOverBackColor = LocalizationManager.GetColor("ButtonHover");
+                    }
+                    else if (control is TextBox textBox)
+                    {
+                        textBox.BackColor = LocalizationManager.GetColor("InputBackground");
+                        textBox.ForeColor = LocalizationManager.GetColor("InputForeground");
+                    }
+                }
+
+                if (mainForm.pnlTags != null)
+                {
+                    mainForm.pnlTags.BackColor = LocalizationManager.GetColor("PanelBackground");
+                }
+
+                mainForm.lstNotes.Invalidate();
+            }
+            else if (form is NoteForm noteForm)
+            {
+                noteForm.ApplyTheme();
+            }
+            else if (form is ViewNoteForm viewForm)
+            {
+                viewForm.ApplyTheme();
+            }
+        }
+
+        private void AboutMenuItem_Click(object sender, EventArgs e)
+        {
+            using (var aboutForm = new AboutForm())
+            {
+                aboutForm.ShowDialog();
+            }
         }
     }
 }

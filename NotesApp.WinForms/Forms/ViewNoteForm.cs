@@ -15,10 +15,12 @@ namespace NotesApp.WinForms.Forms
             _note = note;
             InitializeComponent();
 
-            // Подписываемся на изменение языка
+            // Подписываемся на изменение языка и темы
             LocalizationManager.LanguageChanged += OnLanguageChanged;
+            LocalizationManager.ThemeChanged += OnThemeChanged;
 
             LoadNote();
+            ApplyTheme();
         }
 
         private void OnLanguageChanged(object sender, EventArgs e)
@@ -26,10 +28,62 @@ namespace NotesApp.WinForms.Forms
             LoadNote();
         }
 
+        private void OnThemeChanged(object sender, EventArgs e)
+        {
+            ApplyTheme();
+            LoadNote();
+        }
+
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
             LocalizationManager.LanguageChanged -= OnLanguageChanged;
+            LocalizationManager.ThemeChanged -= OnThemeChanged;
             base.OnFormClosed(e);
+        }
+
+        public void ApplyTheme()
+        {
+            this.BackColor = LocalizationManager.GetColor("Background");
+            this.ForeColor = LocalizationManager.GetColor("Foreground");
+
+            foreach (Control control in this.Controls)
+            {
+                if (control is Panel panel)
+                {
+                    panel.BackColor = LocalizationManager.GetColor("HeaderBackground");
+                    panel.ForeColor = LocalizationManager.GetColor("Foreground");
+                }
+                else if (control is TextBox textBox)
+                {
+                    textBox.BackColor = LocalizationManager.GetColor("InputBackground");
+                    textBox.ForeColor = LocalizationManager.GetColor("InputForeground");
+                    textBox.BorderStyle = BorderStyle.FixedSingle;
+                }
+                else if (control is Button button)
+                {
+                    button.BackColor = LocalizationManager.GetColor("ButtonBackground");
+                    button.ForeColor = LocalizationManager.GetColor("ButtonText");
+                    button.FlatStyle = FlatStyle.Flat;
+                    button.FlatAppearance.BorderColor = LocalizationManager.GetColor("BorderColor");
+                    button.FlatAppearance.MouseOverBackColor = LocalizationManager.GetColor("ButtonHover");
+                }
+                else if (control is Label label && label != lblTitle)
+                {
+                    label.ForeColor = LocalizationManager.GetColor("Foreground");
+                }
+            }
+
+            // Заголовок всегда контрастный
+            if (LocalizationManager.CurrentTheme == "dark")
+            {
+                lblTitle.ForeColor = Color.White;
+                pnlHeader.BackColor = Color.FromArgb(70, 70, 70);
+            }
+            else
+            {
+                lblTitle.ForeColor = Color.Black;
+                pnlHeader.BackColor = Color.LightSteelBlue;
+            }
         }
 
         private void LoadNote()
@@ -45,22 +99,19 @@ namespace NotesApp.WinForms.Forms
 
             txtContent.Text = _note.Content;
 
-            // Очищаем панель тегов
             flpTags.Controls.Clear();
 
-            // Добавляем заголовок для тегов
             var lblTagsHeader = new Label
             {
                 Text = LocalizationManager.GetString("Tags_Header"),
                 Font = new Font("Microsoft Sans Serif", 11, FontStyle.Bold),
                 AutoSize = true,
                 Padding = new Padding(5),
-                ForeColor = Color.DimGray,
+                ForeColor = LocalizationManager.GetColor("Foreground"),
                 Margin = new Padding(3, 3, 10, 3)
             };
             flpTags.Controls.Add(lblTagsHeader);
 
-            // Отображаем теги
             if (_note.Tags != null && _note.Tags.Any())
             {
                 foreach (var tag in _note.Tags)
@@ -71,7 +122,8 @@ namespace NotesApp.WinForms.Forms
                         AutoSize = true,
                         Padding = new Padding(8, 5, 8, 5),
                         Margin = new Padding(5, 3, 5, 3),
-                        BackColor = Color.LightSteelBlue,
+                        BackColor = LocalizationManager.GetColor("TagBackground"),
+                        ForeColor = LocalizationManager.GetColor("TagText"),
                         BorderStyle = BorderStyle.FixedSingle,
                         Font = new Font("Microsoft Sans Serif", 10),
                         TextAlign = ContentAlignment.MiddleCenter
@@ -89,7 +141,7 @@ namespace NotesApp.WinForms.Forms
                     Font = new Font("Microsoft Sans Serif", 9, FontStyle.Italic),
                     AutoSize = true,
                     Padding = new Padding(5),
-                    ForeColor = Color.Gray,
+                    ForeColor = LocalizationManager.GetColor("DateText"),
                     Margin = new Padding(10, 3, 3, 3)
                 };
                 flpTags.Controls.Add(lblTagCount);
@@ -101,9 +153,9 @@ namespace NotesApp.WinForms.Forms
                     Text = LocalizationManager.GetString("NoTags_"),
                     AutoSize = true,
                     Padding = new Padding(10, 8, 10, 8),
-                    ForeColor = Color.Gray,
+                    ForeColor = LocalizationManager.GetColor("DateText"),
                     Font = new Font("Microsoft Sans Serif", 10),
-                    BackColor = Color.LightGray,
+                    BackColor = LocalizationManager.GetColor("PanelBackground"),
                     BorderStyle = BorderStyle.FixedSingle
                 };
                 flpTags.Controls.Add(lblNoTags);

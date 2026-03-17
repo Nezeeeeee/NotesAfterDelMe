@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
-using System.Windows.Forms;
+using System;
 
 namespace NotesApp.WinForms
 {
     public static class LocalizationManager
     {
-        private static string _currentLanguage = "ru"; // По умолчанию русский
+        private static string _currentLanguage = "ru";
+        private static string _currentTheme = "light";
 
         public static string CurrentLanguage
         {
@@ -17,11 +18,75 @@ namespace NotesApp.WinForms
             }
         }
 
-        public static event System.EventHandler LanguageChanged;
+        public static string CurrentTheme
+        {
+            get { return _currentTheme; }
+            set
+            {
+                _currentTheme = value;
+                OnThemeChanged();
+            }
+        }
+
+        public static event EventHandler LanguageChanged;
+        public static event EventHandler ThemeChanged;
 
         private static void OnLanguageChanged()
         {
-            LanguageChanged?.Invoke(null, System.EventArgs.Empty);
+            LanguageChanged?.Invoke(null, EventArgs.Empty);
+        }
+
+        private static void OnThemeChanged()
+        {
+            ThemeChanged?.Invoke(null, EventArgs.Empty);
+        }
+
+        public static System.Drawing.Color GetColor(string colorName)
+        {
+            if (_currentTheme == "dark")
+            {
+                return colorName switch
+                {
+                    "Background" => System.Drawing.Color.FromArgb(32, 32, 32),
+                    "Foreground" => System.Drawing.Color.FromArgb(220, 220, 220),
+                    "PanelBackground" => System.Drawing.Color.FromArgb(45, 45, 45),
+                    "PanelBorder" => System.Drawing.Color.FromArgb(64, 64, 64),
+                    "ButtonBackground" => System.Drawing.Color.FromArgb(70, 70, 70),
+                    "ButtonHover" => System.Drawing.Color.FromArgb(90, 90, 90),
+                    "ButtonText" => System.Drawing.Color.FromArgb(240, 240, 240),
+                    "SelectedItem" => System.Drawing.Color.FromArgb(75, 110, 175),
+                    "TagBackground" => System.Drawing.Color.FromArgb(80, 100, 120),
+                    "TagText" => System.Drawing.Color.FromArgb(240, 240, 240),
+                    "DateText" => System.Drawing.Color.FromArgb(150, 150, 150),
+                    "HeaderBackground" => System.Drawing.Color.FromArgb(55, 55, 55),
+                    "InputBackground" => System.Drawing.Color.FromArgb(40, 40, 40),
+                    "InputForeground" => System.Drawing.Color.FromArgb(240, 240, 240),
+                    "BorderColor" => System.Drawing.Color.FromArgb(80, 80, 80),
+                    _ => System.Drawing.Color.FromArgb(32, 32, 32)
+                };
+            }
+            else
+            {
+                return colorName switch
+                {
+                    "Background" => System.Drawing.Color.FromArgb(240, 240, 240),
+                    "Foreground" => System.Drawing.Color.FromArgb(32, 32, 32),
+                    "PanelBackground" => System.Drawing.Color.FromArgb(250, 250, 250),
+                    "PanelBorder" => System.Drawing.Color.FromArgb(200, 200, 200),
+                    "ButtonBackground" => System.Drawing.Color.FromArgb(230, 230, 230),
+                    "ButtonHover" => System.Drawing.Color.FromArgb(210, 210, 210),
+                    "ButtonText" => System.Drawing.Color.FromArgb(32, 32, 32),
+                    "SelectedItem" => System.Drawing.Color.FromArgb(173, 216, 230),
+                    "TagBackground" => System.Drawing.Color.FromArgb(176, 196, 222),
+                    "TagText" => System.Drawing.Color.FromArgb(32, 32, 32),
+                    "DateText" => System.Drawing.Color.FromArgb(105, 105, 105),
+                    "HeaderBackground" => System.Drawing.Color.FromArgb(230, 230, 250),
+                    "InputBackground" => System.Drawing.Color.FromArgb(255, 255, 255),
+                    "InputForeground" => System.Drawing.Color.FromArgb(32, 32, 32),
+                    "BorderColor" => System.Drawing.Color.FromArgb(200, 200, 200),
+                    _ => System.Drawing.Color.FromArgb(240, 240, 240)
+                };
+            }
         }
 
         public static Dictionary<string, string> GetStrings()
@@ -47,6 +112,14 @@ namespace NotesApp.WinForms
                     { "DeleteTagError", "Error deleting tag: {0}" },
                     { "ConfirmDelete", "Confirm Delete" },
                     { "DeleteNoteConfirm", "Delete note '{0}'?" },
+                    { "LightTheme", "Light" },
+                    { "DarkTheme", "Dark" },
+                    { "File", "File" },
+                    { "About", "About" },
+                    { "AboutTitle", "About Program" },
+                    { "Version", "Version" },
+                    { "Author", "Author" },
+                    { "AppDescription", "Notes management application with tag support, search, multi-select and theme switching." },
                     
                     // NoteForm
                     { "EditNote", "Edit Note" },
@@ -70,7 +143,7 @@ namespace NotesApp.WinForms
                     { "NoTags_", "No tags" }
                 };
             }
-            else // Русский
+            else
             {
                 return new Dictionary<string, string>
                 {
@@ -91,12 +164,20 @@ namespace NotesApp.WinForms
                     { "DeleteTagError", "Ошибка при удалении тега: {0}" },
                     { "ConfirmDelete", "Подтверждение удаления" },
                     { "DeleteNoteConfirm", "Удалить заметку '{0}'?" },
+                    { "LightTheme", "Светлая" },
+                    { "DarkTheme", "Темная" },
+                    { "File", "Файл" },
+                    { "About", "О программе" },
+                    { "AboutTitle", "О программе" },
+                    { "Version", "Версия" },
+                    { "Author", "Автор" },
+                    { "AppDescription", "Приложение для управления заметками с поддержкой тегов, поиска, множественного выбора и смены темы." },
                     
                     // NoteForm
-                    { "EditNote", "Редактирование заметки" },
+                    { "EditNote", "Редактирование" },
                     { "NewNote", "Новая заметка" },
                     { "Title", "Заголовок:" },
-                    { "Content", "Содержание:" },
+                    { "Content", "Текст:" },
                     { "Tags_", "Теги:" },
                     { "Save", "Сохранить" },
                     { "Cancel", "Отмена" },
