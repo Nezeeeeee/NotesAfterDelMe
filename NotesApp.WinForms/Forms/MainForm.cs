@@ -15,6 +15,7 @@ namespace NotesApp.WinForms.Forms
         private readonly INoteService _noteService;
         private List<NoteDto> _currentNotes = new List<NoteDto>();
         private List<string> _selectedTags = new List<string>();
+        private NoteCard _selectedCard;
 
         public MainForm(INoteService noteService)
         {
@@ -22,9 +23,6 @@ namespace NotesApp.WinForms.Forms
             {
                 _noteService = noteService;
                 InitializeComponent();
-
-                // Подписываемся на двойной клик
-                this.lstNotes.DoubleClick += LstNotes_DoubleClick;
 
                 // Подписываемся на изменение темы
                 LocalizationManager.ThemeChanged += OnThemeChanged;
@@ -222,8 +220,78 @@ namespace NotesApp.WinForms.Forms
 
         private void RefreshNotesList()
         {
-            lstNotes.DataSource = null;
-            lstNotes.DataSource = _currentNotes;
+            flpNotes.Controls.Clear();
+            _selectedCard = null;
+            UpdateButtonsState();
+
+            foreach (var note in _currentNotes)
+            {
+                var card = new NoteCard(note);
+                card.Margin = new Padding(10);
+                card.NoteClick += OnNoteCardClick;
+                card.NoteDoubleClick += OnNoteCardDoubleClick;
+                card.EditClick += OnNoteCardEdit;
+                card.DeleteClick += OnNoteCardDelete;
+                flpNotes.Controls.Add(card);
+            }
+        }
+
+        private void OnNoteCardClick(object sender, NoteDto note)
+        {
+            // Снимаем выделение с предыдущей карточки
+            if (_selectedCard != null)
+            {
+                _selectedCard.IsSelected = false;
+            }
+
+            // Выделяем новую карточку
+            _selectedCard = sender as NoteCard;
+            if (_selectedCard != null)
+            {
+                _selectedCard.IsSelected = true;
+            }
+
+            UpdateButtonsState();
+        }
+
+        private void OnNoteCardDoubleClick(object sender, NoteDto note)
+        {
+            using (var viewForm = new ViewNoteForm(note))
+            {
+                viewForm.ShowDialog();
+            }
+        }
+
+        private void OnNoteCardEdit(object sender, NoteDto note)
+        {
+            using (var form = new NoteForm(_noteService, note))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    LoadNotesAsync();
+                }
+            }
+        }
+
+        private async void OnNoteCardDelete(object sender, NoteDto note)
+        {
+            var result = MessageBox.Show(
+                LocalizationManager.GetString("DeleteNoteConfirm", note.Title),
+                LocalizationManager.GetString("ConfirmDelete"),
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
+            {
+                await _noteService.DeleteNoteAsync(note.Id);
+                LoadNotesAsync();
+            }
+        }
+
+        private void UpdateButtonsState()
+        {
+            btnEdit.Enabled = _selectedCard != null;
+            btnDelete.Enabled = _selectedCard != null;
         }
 
         private void UpdateSearchResultInfo()
@@ -276,15 +344,8 @@ namespace NotesApp.WinForms.Forms
                     lblSelectedTags.Text = $"Selected: {selectedTagsText}";
 
                 lblSelectedTags.Visible = true;
-
-                // Принудительно обновляем отображение
                 lblSelectedTags.Invalidate();
                 lblSelectedTags.Refresh();
-
-                // Логируем для отладки (можно удалить позже)
-                System.Diagnostics.Debug.WriteLine($"Selected tags: {selectedTagsText}");
-                System.Diagnostics.Debug.WriteLine($"Label text: {lblSelectedTags.Text}");
-                System.Diagnostics.Debug.WriteLine($"Label size: {lblSelectedTags.Size}");
             }
             else
             {
@@ -293,80 +354,11 @@ namespace NotesApp.WinForms.Forms
             }
         }
 
-        private void LstNotes_DrawItem(object sender, DrawItemEventArgs e)
+        private void FlpNotes_Resize(object sender, EventArgs e)
         {
-            if (e.Index < 0) return;
-
-            var listBox = sender as ListBox;
-            var note = listBox?.Items[e.Index] as NoteDto;
-            if (note == null) return;
-
-            if ((e.State & DrawItemState.Selected) == DrawItemState.Selected)
-            {
-                e.Graphics.FillRectangle(new SolidBrush(LocalizationManager.GetColor("SelectedItem")), e.Bounds);
-            }
-            else
-            {
-                e.Graphics.FillRectangle(new SolidBrush(LocalizationManager.GetColor("Background")), e.Bounds);
-            }
-
-            using (var titleFont = new Font(e.Font, FontStyle.Bold))
-            {
-                e.Graphics.DrawString(note.Title, titleFont, new SolidBrush(LocalizationManager.GetColor("Foreground")),
-                    new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 5, e.Bounds.Width - 10, 20));
-            }
-
-            var dateStr = note.UpdatedAt.ToString("dd.MM.yyyy HH:mm");
-            e.Graphics.DrawString(dateStr, e.Font, new SolidBrush(LocalizationManager.GetColor("DateText")),
-                new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 25, e.Bounds.Width - 10, 15));
-
-            string content = note.Content ?? "";
-            if (content.Length > 50)
-                content = content.Substring(0, 50) + "...";
-
-            e.Graphics.DrawString(content, e.Font, new SolidBrush(LocalizationManager.GetColor("Foreground")),
-                new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 40, e.Bounds.Width - 10, 20));
-
-            if (note.Tags.Any())
-            {
-                string tagsStr;
-                if (note.Tags.Count > 5)
-                {
-                    var firstFive = string.Join(", ", note.Tags.Take(5));
-                    tagsStr = $"Tags: {firstFive} ... и еще {note.Tags.Count - 5}";
-                }
-                else
-                {
-                    tagsStr = "Tags: " + string.Join(", ", note.Tags);
-                }
-
-                e.Graphics.DrawString(tagsStr, e.Font, new SolidBrush(LocalizationManager.GetColor("TagText")),
-                    new RectangleF(e.Bounds.X + 5, e.Bounds.Y + 62, e.Bounds.Width - 10, 15));
-            }
-
-            e.DrawFocusRectangle();
-        }
-
-        private void LstNotes_MeasureItem(object sender, MeasureItemEventArgs e)
-        {
-            e.ItemHeight = 80;
-        }
-
-        private void LstNotes_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            btnEdit.Enabled = lstNotes.SelectedItem != null;
-            btnDelete.Enabled = lstNotes.SelectedItem != null;
-        }
-
-        private void LstNotes_DoubleClick(object sender, EventArgs e)
-        {
-            if (lstNotes.SelectedItem is NoteDto selectedNote)
-            {
-                using (var viewForm = new ViewNoteForm(selectedNote))
-                {
-                    viewForm.ShowDialog();
-                }
-            }
+            // Перестраиваем карточки при изменении размера
+            flpNotes.SuspendLayout();
+            flpNotes.ResumeLayout();
         }
 
         private async void BtnSearch_Click(object sender, EventArgs e)
@@ -399,33 +391,18 @@ namespace NotesApp.WinForms.Forms
 
         private void BtnEdit_Click(object sender, EventArgs e)
         {
-            if (lstNotes.SelectedItem is NoteDto selectedNote)
+            if (_selectedCard != null)
             {
-                using (var form = new NoteForm(_noteService, selectedNote))
-                {
-                    if (form.ShowDialog() == DialogResult.OK)
-                    {
-                        LoadNotesAsync();
-                    }
-                }
+                OnNoteCardEdit(_selectedCard, _selectedCard.Note);
             }
         }
 
         private async void BtnDelete_Click(object sender, EventArgs e)
         {
-            if (lstNotes.SelectedItem is NoteDto selectedNote)
+            if (_selectedCard != null)
             {
-                var result = MessageBox.Show(
-                    LocalizationManager.GetString("DeleteNoteConfirm", selectedNote.Title),
-                    LocalizationManager.GetString("ConfirmDelete"),
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Question);
-
-                if (result == DialogResult.Yes)
-                {
-                    await _noteService.DeleteNoteAsync(selectedNote.Id);
-                    LoadNotesAsync();
-                }
+                await _noteService.DeleteNoteAsync(_selectedCard.Note.Id);
+                LoadNotesAsync();
             }
         }
 
@@ -506,6 +483,15 @@ namespace NotesApp.WinForms.Forms
             UpdateSearchResultInfo();
             UpdateSelectedTagsDisplay();
             LoadAllTagsAsync();
+
+            // Обновляем темы карточек
+            foreach (Control control in flpNotes.Controls)
+            {
+                if (control is NoteCard card)
+                {
+                    card.UpdateTheme();
+                }
+            }
         }
 
         private void CmbTheme_SelectedIndexChanged(object sender, EventArgs e)
@@ -559,11 +545,6 @@ namespace NotesApp.WinForms.Forms
                         panel.BackColor = LocalizationManager.GetColor("PanelBackground");
                         panel.ForeColor = LocalizationManager.GetColor("Foreground");
                     }
-                    else if (control is ListBox listBox)
-                    {
-                        listBox.BackColor = LocalizationManager.GetColor("InputBackground");
-                        listBox.ForeColor = LocalizationManager.GetColor("InputForeground");
-                    }
                     else if (control is Button button)
                     {
                         button.BackColor = LocalizationManager.GetColor("ButtonBackground");
@@ -575,6 +556,15 @@ namespace NotesApp.WinForms.Forms
                         textBox.BackColor = LocalizationManager.GetColor("InputBackground");
                         textBox.ForeColor = LocalizationManager.GetColor("InputForeground");
                     }
+                    else if (control is ComboBox comboBox)
+                    {
+                        comboBox.BackColor = LocalizationManager.GetColor("InputBackground");
+                        comboBox.ForeColor = LocalizationManager.GetColor("InputForeground");
+                    }
+                    else if (control is FlowLayoutPanel flp && flp != flpNotes)
+                    {
+                        flp.BackColor = LocalizationManager.GetColor("PanelBackground");
+                    }
                 }
 
                 if (mainForm.pnlTags != null)
@@ -582,7 +572,14 @@ namespace NotesApp.WinForms.Forms
                     mainForm.pnlTags.BackColor = LocalizationManager.GetColor("PanelBackground");
                 }
 
-                mainForm.lstNotes.Invalidate();
+                // Обновляем карточки
+                foreach (Control control in flpNotes.Controls)
+                {
+                    if (control is NoteCard card)
+                    {
+                        card.UpdateTheme();
+                    }
+                }
             }
         }
 

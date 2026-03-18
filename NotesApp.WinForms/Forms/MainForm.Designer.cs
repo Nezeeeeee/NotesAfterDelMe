@@ -8,7 +8,7 @@ namespace NotesApp.WinForms.Forms
         private System.ComponentModel.IContainer components = null;
 
         // Объявляем все поля класса
-        private System.Windows.Forms.ListBox lstNotes;
+        private System.Windows.Forms.FlowLayoutPanel flpNotes; // Заменяем ListBox на FlowLayoutPanel
         private System.Windows.Forms.TextBox txtSearch;
         private System.Windows.Forms.TextBox txtTagFilter;
         private System.Windows.Forms.Button btnSearch;
@@ -75,7 +75,7 @@ namespace NotesApp.WinForms.Forms
             this.tlpInfoPanel = new System.Windows.Forms.TableLayoutPanel();
             this.lblSearchInfo = new System.Windows.Forms.Label();
             this.lblSelectedTags = new System.Windows.Forms.Label();
-            this.lstNotes = new System.Windows.Forms.ListBox();
+            this.flpNotes = new System.Windows.Forms.FlowLayoutPanel(); // Новая панель для заметок
 
             // menuStrip
             this.menuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -305,25 +305,23 @@ namespace NotesApp.WinForms.Forms
             this.tlpInfoPanel.Controls.Add(this.lblSearchInfo, 0, 0);
             this.tlpInfoPanel.Controls.Add(this.lblSelectedTags, 1, 0);
 
-            // lstNotes
-            this.lstNotes.DisplayMember = "Title";
-            this.lstNotes.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.lstNotes.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
-            this.lstNotes.IntegralHeight = false;
-            this.lstNotes.ItemHeight = 60;
-            this.lstNotes.Location = new System.Drawing.Point(0, 264);
-            this.lstNotes.Name = "lstNotes";
-            this.lstNotes.Size = new System.Drawing.Size(1200, 397);
-            this.lstNotes.TabIndex = 0;
-            this.lstNotes.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.LstNotes_DrawItem);
-            this.lstNotes.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.LstNotes_MeasureItem);
-            this.lstNotes.SelectedIndexChanged += new System.EventHandler(this.LstNotes_SelectedIndexChanged);
+            // flpNotes - панель для заметок
+            this.flpNotes.AutoScroll = true;
+            this.flpNotes.BackColor = System.Drawing.Color.White;
+            this.flpNotes.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpNotes.Location = new System.Drawing.Point(0, 264);
+            this.flpNotes.Name = "flpNotes";
+            this.flpNotes.Padding = new System.Windows.Forms.Padding(10);
+            this.flpNotes.Size = new System.Drawing.Size(1200, 397);
+            this.flpNotes.TabIndex = 0;
+            this.flpNotes.WrapContents = true;
+            this.flpNotes.Resize += new System.EventHandler(this.FlpNotes_Resize);
 
             // MainForm
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1200, 661);
-            this.Controls.Add(this.lstNotes);
+            this.Controls.Add(this.flpNotes);
             this.Controls.Add(this.pnlTags);
             this.Controls.Add(this.searchPanel);
             this.Controls.Add(this.menuStrip);
