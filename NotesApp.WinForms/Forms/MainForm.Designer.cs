@@ -33,7 +33,7 @@ namespace NotesApp.WinForms.Forms
         private System.Windows.Forms.Button btnClearTags;
         private System.Windows.Forms.Label lblSearchInfo;
         private System.Windows.Forms.Label lblSelectedTags;
-        private System.Windows.Forms.TableLayoutPanel tlpInfoPanel; // Новая панель
+        private System.Windows.Forms.TableLayoutPanel tlpInfoPanel;
 
         protected override void Dispose(bool disposing)
         {
@@ -92,15 +92,10 @@ namespace NotesApp.WinForms.Forms
 
             // exportMenu
             this.exportMenu.Text = "Экспорт";
-
-            // exportAllNotesMenuItem
             this.exportAllNotesMenuItem.Text = "Экспорт всех заметок";
             this.exportAllNotesMenuItem.Click += new System.EventHandler(this.ExportAllNotesMenuItem_Click);
-
-            // exportFilteredMenuItem
             this.exportFilteredMenuItem.Text = "Экспорт отфильтрованных";
             this.exportFilteredMenuItem.Click += new System.EventHandler(this.ExportFilteredMenuItem_Click);
-
             this.exportMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
                 this.exportAllNotesMenuItem,
                 this.exportFilteredMenuItem
@@ -125,12 +120,11 @@ namespace NotesApp.WinForms.Forms
             this.searchPanel.Controls.Add(this.cmbLanguage);
             this.searchPanel.Controls.Add(this.cmbTheme);
             this.searchPanel.Controls.Add(this.actionPanel);
-            this.searchPanel.Controls.Add(this.tlpInfoPanel);
             this.searchPanel.Dock = System.Windows.Forms.DockStyle.Top;
             this.searchPanel.Location = new System.Drawing.Point(0, 24);
             this.searchPanel.Name = "searchPanel";
             this.searchPanel.Padding = new System.Windows.Forms.Padding(10);
-            this.searchPanel.Size = new System.Drawing.Size(1200, 140);
+            this.searchPanel.Size = new System.Drawing.Size(1200, 100);
             this.searchPanel.TabIndex = 2;
 
             // lblSearch
@@ -139,52 +133,61 @@ namespace NotesApp.WinForms.Forms
             this.lblSearch.Size = new System.Drawing.Size(50, 25);
             this.lblSearch.TabIndex = 0;
             this.lblSearch.Text = "Search:";
+            this.lblSearch.Anchor = AnchorStyles.Left;
+            this.lblSearch.TextAlign = ContentAlignment.MiddleRight;
 
             // txtSearch
             this.txtSearch.Location = new System.Drawing.Point(70, 12);
             this.txtSearch.Name = "txtSearch";
-            this.txtSearch.Size = new System.Drawing.Size(300, 23);
+            this.txtSearch.Size = new System.Drawing.Size(250, 23);
             this.txtSearch.TabIndex = 1;
+            this.txtSearch.Anchor = AnchorStyles.Left;
 
             // lblTags
-            this.lblTags.Location = new System.Drawing.Point(380, 15);
+            this.lblTags.Location = new System.Drawing.Point(340, 15);
             this.lblTags.Name = "lblTags";
             this.lblTags.Size = new System.Drawing.Size(40, 25);
             this.lblTags.TabIndex = 2;
             this.lblTags.Text = "Tags:";
+            this.lblTags.Anchor = AnchorStyles.Left;
+            this.lblTags.TextAlign = ContentAlignment.MiddleRight;
 
             // txtTagFilter
-            this.txtTagFilter.Location = new System.Drawing.Point(430, 12);
+            this.txtTagFilter.Location = new System.Drawing.Point(390, 12);
             this.txtTagFilter.Name = "txtTagFilter";
             this.txtTagFilter.PlaceholderText = "tag1, tag2, tag3";
             this.txtTagFilter.Size = new System.Drawing.Size(200, 23);
             this.txtTagFilter.TabIndex = 3;
+            this.txtTagFilter.Anchor = AnchorStyles.Left;
 
             // btnSearch
-            this.btnSearch.Location = new System.Drawing.Point(640, 10);
+            this.btnSearch.Location = new System.Drawing.Point(600, 10);
             this.btnSearch.Name = "btnSearch";
             this.btnSearch.Size = new System.Drawing.Size(100, 30);
             this.btnSearch.TabIndex = 4;
             this.btnSearch.Text = "Search";
             this.btnSearch.Click += new System.EventHandler(this.BtnSearch_Click);
+            this.btnSearch.Anchor = AnchorStyles.Left;
 
             // cmbLanguage
             this.cmbLanguage.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbLanguage.Items.AddRange(new object[] { "Русский", "English" });
-            this.cmbLanguage.Location = new System.Drawing.Point(860, 12);
+            this.cmbLanguage.Location = new System.Drawing.Point(820, 12);
             this.cmbLanguage.Name = "cmbLanguage";
             this.cmbLanguage.Size = new System.Drawing.Size(120, 23);
             this.cmbLanguage.TabIndex = 6;
             this.cmbLanguage.SelectedIndexChanged += new System.EventHandler(this.CmbLanguage_SelectedIndexChanged);
+            this.cmbLanguage.Anchor = AnchorStyles.Right;
 
             // cmbTheme
             this.cmbTheme.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.cmbTheme.Items.AddRange(new object[] { "Светлая", "Темная" });
-            this.cmbTheme.Location = new System.Drawing.Point(990, 12);
+            this.cmbTheme.Location = new System.Drawing.Point(950, 12);
             this.cmbTheme.Name = "cmbTheme";
             this.cmbTheme.Size = new System.Drawing.Size(120, 23);
             this.cmbTheme.TabIndex = 7;
             this.cmbTheme.SelectedIndexChanged += new System.EventHandler(this.CmbTheme_SelectedIndexChanged);
+            this.cmbTheme.Anchor = AnchorStyles.Right;
 
             // actionPanel
             this.actionPanel.Controls.Add(this.btnAdd);
@@ -194,6 +197,7 @@ namespace NotesApp.WinForms.Forms
             this.actionPanel.Name = "actionPanel";
             this.actionPanel.Size = new System.Drawing.Size(1180, 40);
             this.actionPanel.TabIndex = 5;
+            this.actionPanel.Anchor = AnchorStyles.Left | AnchorStyles.Right;
 
             // btnAdd
             this.btnAdd.Location = new System.Drawing.Point(0, 0);
@@ -202,6 +206,7 @@ namespace NotesApp.WinForms.Forms
             this.btnAdd.TabIndex = 0;
             this.btnAdd.Text = "Add Note";
             this.btnAdd.Click += new System.EventHandler(this.BtnAdd_Click);
+            this.btnAdd.Anchor = AnchorStyles.Left;
 
             // btnEdit
             this.btnEdit.Location = new System.Drawing.Point(110, 0);
@@ -210,6 +215,7 @@ namespace NotesApp.WinForms.Forms
             this.btnEdit.TabIndex = 1;
             this.btnEdit.Text = "Edit";
             this.btnEdit.Click += new System.EventHandler(this.BtnEdit_Click);
+            this.btnEdit.Anchor = AnchorStyles.Left;
 
             // btnDelete
             this.btnDelete.Location = new System.Drawing.Point(220, 0);
@@ -218,6 +224,7 @@ namespace NotesApp.WinForms.Forms
             this.btnDelete.TabIndex = 2;
             this.btnDelete.Text = "Delete";
             this.btnDelete.Click += new System.EventHandler(this.BtnDelete_Click);
+            this.btnDelete.Anchor = AnchorStyles.Left;
 
             // pnlTags
             this.pnlTags.BackColor = System.Drawing.Color.WhiteSmoke;
@@ -225,11 +232,12 @@ namespace NotesApp.WinForms.Forms
             this.pnlTags.Controls.Add(this.lblTagsTitle);
             this.pnlTags.Controls.Add(this.btnClearTags);
             this.pnlTags.Controls.Add(this.flpTagFilters);
+            this.pnlTags.Controls.Add(this.tlpInfoPanel);
             this.pnlTags.Dock = System.Windows.Forms.DockStyle.Top;
-            this.pnlTags.Location = new System.Drawing.Point(0, 164);
+            this.pnlTags.Location = new System.Drawing.Point(0, 124);
             this.pnlTags.Name = "pnlTags";
             this.pnlTags.Padding = new System.Windows.Forms.Padding(10);
-            this.pnlTags.Size = new System.Drawing.Size(1200, 120);
+            this.pnlTags.Size = new System.Drawing.Size(1200, 140);
             this.pnlTags.TabIndex = 1;
 
             // lblTagsTitle
@@ -239,6 +247,7 @@ namespace NotesApp.WinForms.Forms
             this.lblTagsTitle.Size = new System.Drawing.Size(400, 20);
             this.lblTagsTitle.TabIndex = 0;
             this.lblTagsTitle.Text = "Фильтр по тегам (выберите один или несколько):";
+            this.lblTagsTitle.Anchor = AnchorStyles.Left | AnchorStyles.Top;
 
             // btnClearTags
             this.btnClearTags.Location = new System.Drawing.Point(1050, 3);
@@ -247,6 +256,7 @@ namespace NotesApp.WinForms.Forms
             this.btnClearTags.TabIndex = 1;
             this.btnClearTags.Text = "Сбросить фильтр";
             this.btnClearTags.Click += new System.EventHandler(this.BtnClearTags_Click);
+            this.btnClearTags.Anchor = AnchorStyles.Right | AnchorStyles.Top;
 
             // flpTagFilters
             this.flpTagFilters.AutoScroll = true;
@@ -254,17 +264,19 @@ namespace NotesApp.WinForms.Forms
             this.flpTagFilters.Location = new System.Drawing.Point(10, 30);
             this.flpTagFilters.Name = "flpTagFilters";
             this.flpTagFilters.Padding = new System.Windows.Forms.Padding(5);
-            this.flpTagFilters.Size = new System.Drawing.Size(1170, 80);
+            this.flpTagFilters.Size = new System.Drawing.Size(1170, 60);
             this.flpTagFilters.TabIndex = 2;
+            this.flpTagFilters.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 
-            // tlpInfoPanel - панель для информации
+            // tlpInfoPanel
             this.tlpInfoPanel.ColumnCount = 2;
             this.tlpInfoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.AutoSize));
             this.tlpInfoPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
-            this.tlpInfoPanel.Location = new System.Drawing.Point(10, 95);
+            this.tlpInfoPanel.Location = new System.Drawing.Point(10, 100);
             this.tlpInfoPanel.Name = "tlpInfoPanel";
-            this.tlpInfoPanel.Size = new System.Drawing.Size(1160, 25);
+            this.tlpInfoPanel.Size = new System.Drawing.Size(1170, 25);
             this.tlpInfoPanel.TabIndex = 10;
+            this.tlpInfoPanel.Anchor = AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Top;
 
             // lblSearchInfo
             this.lblSearchInfo.AutoSize = true;
@@ -282,7 +294,7 @@ namespace NotesApp.WinForms.Forms
             this.lblSelectedTags.Dock = DockStyle.Fill;
             this.lblSelectedTags.Location = new System.Drawing.Point(109, 0);
             this.lblSelectedTags.Name = "lblSelectedTags";
-            this.lblSelectedTags.Size = new System.Drawing.Size(1048, 25);
+            this.lblSelectedTags.Size = new System.Drawing.Size(1058, 25);
             this.lblSelectedTags.TabIndex = 9;
             this.lblSelectedTags.Text = "";
             this.lblSelectedTags.ForeColor = System.Drawing.Color.DarkBlue;
@@ -299,9 +311,9 @@ namespace NotesApp.WinForms.Forms
             this.lstNotes.DrawMode = System.Windows.Forms.DrawMode.OwnerDrawVariable;
             this.lstNotes.IntegralHeight = false;
             this.lstNotes.ItemHeight = 60;
-            this.lstNotes.Location = new System.Drawing.Point(0, 284);
+            this.lstNotes.Location = new System.Drawing.Point(0, 264);
             this.lstNotes.Name = "lstNotes";
-            this.lstNotes.Size = new System.Drawing.Size(1200, 377);
+            this.lstNotes.Size = new System.Drawing.Size(1200, 397);
             this.lstNotes.TabIndex = 0;
             this.lstNotes.DrawItem += new System.Windows.Forms.DrawItemEventHandler(this.LstNotes_DrawItem);
             this.lstNotes.MeasureItem += new System.Windows.Forms.MeasureItemEventHandler(this.LstNotes_MeasureItem);
@@ -317,7 +329,7 @@ namespace NotesApp.WinForms.Forms
             this.Controls.Add(this.menuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menuStrip;
-            this.MinimumSize = new System.Drawing.Size(1200, 700);
+            this.MinimumSize = new System.Drawing.Size(900, 600);
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Notes Manager";
